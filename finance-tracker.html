@@ -1418,6 +1418,193 @@ body.mv2.mv2-page-mode #mv2BackBtn { display: flex !important; }
 }
 .mv2-bn-fab [data-lucide] { width: 26px; height: 26px; }
 
+/* ADD TRANSACTION BOTTOM SHEET */
+.mv2-sheet-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.mv2-sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+.mv2-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top-left-radius: 24px; border-top-right-radius: 24px;
+  z-index: 201;
+  padding: 12px 18px calc(18px + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 92vh;
+  overflow-y: auto;
+  color: #111;
+}
+[data-theme="dark"] .mv2-sheet { background: #1c1c1e; color: #fff; border-top: 1px solid #2c2c2e; }
+.mv2-sheet.open { transform: translateY(0); }
+.mv2-sheet-handle {
+  width: 36px; height: 4px;
+  background: #d1d5db; border-radius: 2px;
+  margin: 0 auto 12px;
+}
+[data-theme="dark"] .mv2-sheet-handle { background: #3f3f46; }
+.mv2-sheet-titlebar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.mv2-sheet-title { font-size: 14px; font-weight: 700; }
+.mv2-sheet-close {
+  background: #f3f4f6; border: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #6b7280; cursor: pointer; padding: 0;
+}
+[data-theme="dark"] .mv2-sheet-close { background: #2c2c2e; color: #fff; }
+.mv2-sheet-close [data-lucide] { width: 14px; height: 14px; }
+
+.mv2-amt-area { text-align: center; margin-bottom: 18px; }
+.mv2-amt-lbl { font-size: 11px; color: #6b7280; margin-bottom: 6px; }
+[data-theme="dark"] .mv2-amt-lbl { color: #9ca3af; }
+.mv2-amt-input-wrap {
+  display: flex; align-items: baseline; justify-content: center; gap: 4px;
+}
+.mv2-amt-curr { font-size: 22px; color: #9ca3af; font-weight: 500; }
+.mv2-amt-input {
+  font-size: 38px; font-weight: 700;
+  border: none; outline: none; background: transparent;
+  text-align: center;
+  max-width: 240px;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+.mv2-amt-input::-webkit-outer-spin-button,
+.mv2-amt-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mv2-amt-input::placeholder { color: #d1d5db; font-weight: 500; }
+[data-theme="dark"] .mv2-amt-input::placeholder { color: #4b5563; }
+
+.mv2-chip-row {
+  display: flex; gap: 6px;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.mv2-chip {
+  background: #f3f4f6; color: #4b5563;
+  border: none;
+  padding: 8px 16px; border-radius: 16px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+}
+[data-theme="dark"] .mv2-chip { background: #2c2c2e; color: #d1d5db; }
+.mv2-chip.active[data-type="expense"] { background: #ef4444; color: #fff; }
+.mv2-chip.active[data-type="income"] { background: #10b981; color: #fff; }
+.mv2-chip.active[data-type="transfer"] { background: #3b82f6; color: #fff; }
+.mv2-chip.active[data-type="settlement"] { background: #8b5cf6; color: #fff; }
+
+.mv2-sect-lbl {
+  font-size: 10px; color: #6b7280;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .mv2-sect-lbl { color: #9ca3af; }
+
+.mv2-cat-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
+  margin-bottom: 14px;
+}
+.mv2-cat-tile {
+  text-align: center; background: none; border: none;
+  padding: 0; cursor: pointer;
+}
+.mv2-cat-ic {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: #f3f4f6; color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 4px;
+}
+[data-theme="dark"] .mv2-cat-ic { background: #2c2c2e; color: #9ca3af; }
+.mv2-cat-ic [data-lucide] { width: 18px; height: 18px; }
+.mv2-cat-tile.active .mv2-cat-ic { background: #fee2e2; color: #dc2626; }
+[data-theme="dark"] .mv2-cat-tile.active .mv2-cat-ic { background: #7f1d1d; color: #fca5a5; }
+.mv2-cat-tile.active.income .mv2-cat-ic { background: #d1fae5; color: #059669; }
+[data-theme="dark"] .mv2-cat-tile.active.income .mv2-cat-ic { background: #064e3b; color: #6ee7b7; }
+.mv2-cat-lbl {
+  font-size: 9px; color: #6b7280;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+[data-theme="dark"] .mv2-cat-lbl { color: #9ca3af; }
+.mv2-cat-tile.active .mv2-cat-lbl { color: #111; font-weight: 600; }
+[data-theme="dark"] .mv2-cat-tile.active .mv2-cat-lbl { color: #fff; }
+
+.mv2-pill-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.mv2-pill-btn {
+  flex: 1; background: #f7f5ef; border: 1px solid #e5e7eb;
+  color: #111; padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; text-align: left;
+  min-width: 0;
+}
+[data-theme="dark"] .mv2-pill-btn { background: #0a0a0a; border-color: #2c2c2e; color: #fff; }
+.mv2-pill-btn [data-lucide] { width: 14px; height: 14px; flex-shrink: 0; color: #6b7280; }
+.mv2-pill-btn .mv2-pill-lbl {
+  flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mv2-pill-btn.compact { flex: 0 0 auto; padding-right: 14px; }
+
+.mv2-hidden-select {
+  position: absolute; opacity: 0; pointer-events: none;
+  width: 0; height: 0; border: 0; padding: 0;
+}
+.mv2-pill-wrap { position: relative; flex: 1; min-width: 0; display: flex; }
+.mv2-pill-wrap .mv2-pill-btn { width: 100%; }
+.mv2-pill-wrap > input,
+.mv2-pill-wrap > select {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer;
+  font-size: 16px; /* prevents iOS zoom */
+  width: 100%; height: 100%;
+  border: none;
+}
+
+.mv2-note-input {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid #e5e7eb; border-radius: 12px;
+  background: #fff; color: inherit;
+  font-size: 12px;
+  margin-bottom: 14px;
+  font-family: inherit;
+}
+[data-theme="dark"] .mv2-note-input { background: #0a0a0a; border-color: #2c2c2e; }
+.mv2-note-input:focus { outline: none; border-color: #4f46e5; }
+
+.mv2-save-row { display: flex; gap: 8px; align-items: center; }
+.mv2-save-btn {
+  flex: 1;
+  background: #4f46e5; color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+}
+.mv2-save-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+.mv2-adv-btn {
+  background: transparent; border: 1px solid #e5e7eb;
+  color: #4f46e5;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+[data-theme="dark"] .mv2-adv-btn { border-color: #2c2c2e; color: #818cf8; }
+.mv2-adv-btn [data-lucide] { width: 14px; height: 14px; }
+
 /* BACK BUTTON (when viewing non-tab pages) */
 #mv2BackBtn {
   position: fixed;
@@ -9823,8 +10010,246 @@ function mv2GoTab(tab) {
   const b = document.getElementById('mv2Body'); if (b) b.scrollTop = 0;
 }
 
+/* ====== ADD TRANSACTION BOTTOM SHEET ====== */
+let mv2Sheet = { type: 'expense', categoryId: null, accountId: null, toAccountId: null, date: null };
+
 function mv2OpenAddSheet() {
-  if (typeof openTxnModal === 'function') openTxnModal();
+  // Build sheet DOM if not exists
+  if (!document.getElementById('mv2AddSheet')) mv2BuildAddSheet();
+  // Default state
+  mv2Sheet.type = 'expense';
+  mv2Sheet.categoryId = null;
+  mv2Sheet.accountId = (state.accounts || []).find(a => a.status === 'Active')?.id || null;
+  mv2Sheet.toAccountId = null;
+  mv2Sheet.date = today();
+  mv2RenderSheetBody();
+  // Show with animation
+  requestAnimationFrame(() => {
+    document.getElementById('mv2SheetBackdrop').classList.add('open');
+    document.getElementById('mv2AddSheet').classList.add('open');
+    setTimeout(() => document.getElementById('mvtxAmount')?.focus(), 280);
+  });
+}
+
+function mv2CloseAddSheet() {
+  document.getElementById('mv2SheetBackdrop')?.classList.remove('open');
+  document.getElementById('mv2AddSheet')?.classList.remove('open');
+}
+
+function mv2BuildAddSheet() {
+  const backdrop = document.createElement('div');
+  backdrop.id = 'mv2SheetBackdrop';
+  backdrop.className = 'mv2-sheet-backdrop';
+  backdrop.onclick = mv2CloseAddSheet;
+  document.body.appendChild(backdrop);
+
+  const sheet = document.createElement('div');
+  sheet.id = 'mv2AddSheet';
+  sheet.className = 'mv2-sheet';
+  document.body.appendChild(sheet);
+}
+
+function mv2RenderSheetBody() {
+  const sheet = document.getElementById('mv2AddSheet'); if (!sheet) return;
+  const t = mv2Sheet.type;
+  const isInc = t === 'income';
+  const isTr = t === 'transfer';
+  const isSet = t === 'settlement';
+
+  // Smart category ordering: use frequency from recent transactions
+  const catKind = isInc ? 'income' : 'expense';
+  const usage = {};
+  (state.transactions || []).filter(x => x.status !== 'Draft').slice(-60).forEach(x => {
+    if (x.categoryId) usage[x.categoryId] = (usage[x.categoryId] || 0) + 1;
+  });
+  const cats = (state.categories || []).filter(c => c.kind === catKind);
+  cats.sort((a, b) => (usage[b.id] || 0) - (usage[a.id] || 0));
+  const quickCats = cats.slice(0, 5);
+
+  // Accounts list (active only)
+  const accts = (state.accounts || []).filter(a => a.status === 'Active');
+  const acctById = id => accts.find(a => a.id === id);
+  const fromAcct = acctById(mv2Sheet.accountId);
+  const toAcct = acctById(mv2Sheet.toAccountId);
+
+  sheet.innerHTML = `
+    <div class="mv2-sheet-handle"></div>
+    <div class="mv2-sheet-titlebar">
+      <div class="mv2-sheet-title">New ${isInc ? 'income' : isTr ? 'transfer' : 'expense'}</div>
+      <button class="mv2-sheet-close" onclick="mv2CloseAddSheet()"><i data-lucide="x"></i></button>
+    </div>
+
+    <div class="mv2-amt-area">
+      <div class="mv2-amt-lbl">Amount</div>
+      <div class="mv2-amt-input-wrap">
+        <span class="mv2-amt-curr">${state.settings?.currency || '₹'}</span>
+        <input class="mv2-amt-input" id="mvtxAmount" type="number" inputmode="decimal" placeholder="0" step="any" />
+      </div>
+    </div>
+
+    <div class="mv2-chip-row">
+      <button class="mv2-chip ${t==='expense'?'active':''}" data-type="expense" onclick="mv2SetSheetType('expense')">Expense</button>
+      <button class="mv2-chip ${t==='income'?'active':''}" data-type="income" onclick="mv2SetSheetType('income')">Income</button>
+      <button class="mv2-chip ${t==='transfer'?'active':''}" data-type="transfer" onclick="mv2SetSheetType('transfer')">Transfer</button>
+    </div>
+
+    ${!isTr ? `
+      <div class="mv2-sect-lbl">Category</div>
+      <div class="mv2-cat-grid">
+        ${quickCats.map(c => `
+          <button class="mv2-cat-tile ${mv2Sheet.categoryId === c.id ? 'active' : ''} ${isInc ? 'income' : ''}" onclick="mv2PickCat('${c.id}')">
+            <div class="mv2-cat-ic"><i data-lucide="${c.icon || 'circle'}"></i></div>
+            <div class="mv2-cat-lbl">${escapeHTML(c.name)}</div>
+          </button>
+        `).join('')}
+        <button class="mv2-cat-tile" onclick="mv2OpenCatPicker()">
+          <div class="mv2-cat-ic"><i data-lucide="more-horizontal"></i></div>
+          <div class="mv2-cat-lbl">More</div>
+        </button>
+      </div>
+    ` : ''}
+
+    <div class="mv2-pill-row">
+      ${isTr ? `
+        <div class="mv2-pill-wrap">
+          <button class="mv2-pill-btn"><i data-lucide="arrow-up-right"></i><span class="mv2-pill-lbl">${fromAcct ? escapeHTML(fromAcct.bank || fromAcct.name) : 'From'}</span></button>
+          <select onchange="mv2Sheet.accountId = this.value; mv2RenderSheetBody();">
+            <option value="">From account</option>
+            ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.accountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
+          </select>
+        </div>
+        <div class="mv2-pill-wrap">
+          <button class="mv2-pill-btn"><i data-lucide="arrow-down-left"></i><span class="mv2-pill-lbl">${toAcct ? escapeHTML(toAcct.bank || toAcct.name) : 'To'}</span></button>
+          <select onchange="mv2Sheet.toAccountId = this.value; mv2RenderSheetBody();">
+            <option value="">To account</option>
+            ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.toAccountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
+          </select>
+        </div>
+      ` : `
+        <div class="mv2-pill-wrap">
+          <button class="mv2-pill-btn"><i data-lucide="building-bank"></i><span class="mv2-pill-lbl">${fromAcct ? escapeHTML(fromAcct.bank || fromAcct.name) : 'Account'}</span></button>
+          <select onchange="mv2Sheet.accountId = this.value; mv2RenderSheetBody();">
+            <option value="">Account</option>
+            ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.accountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
+          </select>
+        </div>
+        <div class="mv2-pill-wrap" style="flex:0 0 130px;">
+          <button class="mv2-pill-btn"><i data-lucide="calendar"></i><span class="mv2-pill-lbl">${mv2DateLabel(mv2Sheet.date)}</span></button>
+          <input type="date" value="${mv2Sheet.date}" onchange="mv2Sheet.date = this.value; mv2RenderSheetBody();" />
+        </div>
+      `}
+    </div>
+
+    ${isTr ? `
+      <div class="mv2-pill-row">
+        <div class="mv2-pill-wrap" style="flex:0 0 130px;">
+          <button class="mv2-pill-btn"><i data-lucide="calendar"></i><span class="mv2-pill-lbl">${mv2DateLabel(mv2Sheet.date)}</span></button>
+          <input type="date" value="${mv2Sheet.date}" onchange="mv2Sheet.date = this.value; mv2RenderSheetBody();" />
+        </div>
+      </div>
+    ` : ''}
+
+    <input class="mv2-note-input" id="mvtxNote" placeholder="${isTr ? 'Note (optional)' : 'Payee or note (optional)'}" />
+
+    <div class="mv2-save-row">
+      <button class="mv2-save-btn" onclick="mv2SaveSheet()">Save</button>
+      <button class="mv2-adv-btn" onclick="mv2CloseAddSheet(); setTimeout(() => typeof openTxnModal === 'function' && openTxnModal(), 200);" title="Advanced (card/split/etc)"><i data-lucide="sliders"></i></button>
+    </div>
+  `;
+  if (window.lucide) lucide.createIcons();
+}
+
+function mv2SetSheetType(type) {
+  mv2Sheet.type = type;
+  mv2Sheet.categoryId = null; // reset cat
+  mv2RenderSheetBody();
+  setTimeout(() => document.getElementById('mvtxAmount')?.focus(), 50);
+}
+
+function mv2PickCat(catId) {
+  mv2Sheet.categoryId = catId;
+  mv2RenderSheetBody();
+  setTimeout(() => document.getElementById('mvtxAmount')?.focus(), 50);
+}
+
+function mv2OpenCatPicker() {
+  const catKind = mv2Sheet.type === 'income' ? 'income' : 'expense';
+  const cats = (state.categories || []).filter(c => c.kind === catKind);
+  let html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 0;">';
+  cats.forEach(c => {
+    html += `<button onclick="mv2PickCatFromModal('${c.id}')" style="background:#f3f4f6;border:none;padding:10px 4px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;"><i data-lucide="${c.icon || 'circle'}" style="width:16px;height:16px;color:#4b5563;"></i><span style="font-size:10px;color:#374151;">${escapeHTML(c.name)}</span></button>`;
+  });
+  html += '</div>';
+  if (typeof openModal === 'function') openModal('Choose category', html);
+}
+
+function mv2PickCatFromModal(catId) {
+  mv2Sheet.categoryId = catId;
+  if (typeof closeModal === 'function') closeModal();
+  mv2RenderSheetBody();
+}
+
+function mv2DateLabel(s) {
+  if (!s) return 'Today';
+  const d = new Date(s); const t = new Date(); t.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  const diff = Math.round((t - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff === -1) return 'Tomorrow';
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+}
+
+async function mv2SaveSheet() {
+  const amount = +(document.getElementById('mvtxAmount')?.value || 0);
+  if (!amount || amount <= 0) { toast('Enter an amount', 'error'); return; }
+  const t = mv2Sheet.type;
+  const isInc = t === 'income';
+  const isTr = t === 'transfer';
+  if (!isTr && !mv2Sheet.categoryId) { toast('Choose a category', 'error'); return; }
+  if (!mv2Sheet.accountId) { toast('Choose an account', 'error'); return; }
+  if (isTr && !mv2Sheet.toAccountId) { toast('Choose destination account', 'error'); return; }
+  if (isTr && mv2Sheet.accountId === mv2Sheet.toAccountId) { toast('From and to must differ', 'error'); return; }
+
+  const typeMap = { expense: 'Expense', income: 'Income', transfer: 'Internal Transfer' };
+  const note = (document.getElementById('mvtxNote')?.value || '').trim();
+  const obj = {
+    id: uid(),
+    type: typeMap[t],
+    status: 'Settled',
+    source: 'Manual',
+    date: mv2Sheet.date || today(),
+    amount,
+    categoryId: isTr ? null : mv2Sheet.categoryId,
+    category: isTr ? 'Transfer' : ((state.categories || []).find(c => c.id === mv2Sheet.categoryId)?.name || ''),
+    subcategory: '',
+    fromAccountId: isInc ? null : mv2Sheet.accountId,
+    toAccountId: isInc ? mv2Sheet.accountId : (isTr ? mv2Sheet.toAccountId : null),
+    cardId: null,
+    loanId: null,
+    insuranceId: null,
+    recurringId: null,
+    payee: isTr ? '' : note,
+    mode: '',
+    reference: '',
+    taxFlag: '',
+    note: isTr ? note : '',
+    draftCreatedAt: nowISO(),
+    settledAt: nowISO()
+  };
+
+  try {
+    state.transactions.push(obj);
+    if (typeof applyTxnToBalance === 'function') await applyTxnToBalance(obj, +1);
+    await dbPut('transactions', obj);
+    if (typeof audit === 'function') await audit('create', 'transaction', obj.id, null, obj);
+    mv2CloseAddSheet();
+    toast('Saved', 'success');
+    if (typeof renderCurrent === 'function') renderCurrent();
+    mv2Render();
+  } catch (err) {
+    console.error('mv2SaveSheet failed:', err);
+    toast('Save failed: ' + err.message, 'error');
+  }
 }
 
 function mv2OpenAlerts() {
