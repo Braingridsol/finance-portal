@@ -1,0 +1,47 @@
+{
+  "name": "Finance Portal",
+  "short_name": "Finance",
+  "description": "Personal finance management — accounts, cards, loans, investments, insurance, recurring, projection, reports and financial health.",
+  "start_url": "./finance-tracker.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fafbfc",
+  "theme_color": "#4f46e5",
+  "lang": "en-IN",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Transaction",
+      "short_name": "Add",
+      "url": "./finance-tracker.html?page=add",
+      "icons": [{ "src": "icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "url": "./finance-tracker.html",
+      "icons": [{ "src": "icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}
