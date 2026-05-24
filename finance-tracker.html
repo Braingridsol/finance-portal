@@ -1057,6 +1057,389 @@ label {
   .chart-wrap { height: 240px; }
   .filter-bar select, .filter-bar input { max-width: 100%; flex: 1; }
 }
+
+/* ========================================================================
+   MOBILE V2 — APK-feel mobile UI (activates on body.mv2)
+======================================================================== */
+body.mv2:not(.mv2-page-mode) .app { display: none !important; }
+body.mv2 .mobile-nav,
+body.mv2 .fab,
+body.mv2 .profile-chip-mobile { display: none !important; }
+body.mv2 .mv2-shell { display: flex; }
+body.mv2.mv2-page-mode .mv2-shell { display: none !important; }
+body.mv2.mv2-page-mode #mv2BackBtn { display: flex !important; }
+#mv2BackBtn { display: none; }
+
+.mv2-shell {
+  display: none;
+  position: fixed; inset: 0;
+  background: #f7f5ef;
+  flex-direction: column;
+  z-index: 80;
+  color: #111;
+}
+[data-theme="dark"] .mv2-shell { background: #000; color: #fff; }
+
+.mv2-header {
+  padding: calc(10px + env(safe-area-inset-top)) 16px 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mv2-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: #4f46e5; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  flex-shrink: 0;
+}
+.mv2-greeting { flex: 1; min-width: 0; }
+.mv2-greeting-small { font-size: 11px; color: #6b7280; line-height: 1.2; }
+[data-theme="dark"] .mv2-greeting-small { color: #9ca3af; }
+.mv2-greeting-name { font-size: 14px; font-weight: 600; }
+.mv2-iconbtn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: #fff; border: 1px solid #e5e7eb;
+  color: #374151;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; cursor: pointer;
+  padding: 0;
+}
+[data-theme="dark"] .mv2-iconbtn { background: #1c1c1e; border-color: #2c2c2e; color: #fff; }
+.mv2-iconbtn .badge-dot {
+  position: absolute; top: 7px; right: 8px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ef4444; border: 2px solid #f7f5ef;
+}
+[data-theme="dark"] .mv2-iconbtn .badge-dot { border-color: #000; }
+
+.mv2-profile-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px 5px 5px;
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  font-size: 12px; font-weight: 600;
+  color: #111;
+  margin: 6px 16px 0;
+  cursor: pointer;
+}
+[data-theme="dark"] .mv2-profile-chip { background: #1c1c1e; border-color: #2c2c2e; color: #fff; }
+.mv2-pc-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #4f46e5; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+}
+.mv2-profile-chip [data-lucide] { width: 14px; height: 14px; color: #6b7280; }
+
+.mv2-pagetitle { font-size: 22px; font-weight: 700; padding: 12px 16px 8px; }
+
+.mv2-body {
+  flex: 1; overflow-y: auto;
+  padding: 14px 16px 110px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* HERO */
+.mv2-hero {
+  background: #111; color: #fff;
+  border-radius: 18px; padding: 16px;
+  margin-bottom: 12px;
+  position: relative; overflow: hidden;
+}
+[data-theme="dark"] .mv2-hero { background: #1c1c1e; border: 1px solid #2c2c2e; }
+.mv2-hero::before {
+  content: ''; position: absolute;
+  top: -30px; right: -20px; width: 120px; height: 120px;
+  background: rgba(79,70,229,0.30); border-radius: 50%;
+  pointer-events: none;
+}
+.mv2-hero-row {
+  position: relative;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; color: #9ca3af; margin-bottom: 6px;
+}
+.mv2-hero-row .pos { color: #34d399; }
+.mv2-hero-row .neg { color: #f87171; }
+.mv2-hero-amt { position: relative; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.mv2-hero-spark { position: relative; width: 100%; height: 26px; }
+
+/* STATS GRID */
+.mv2-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.mv2-stat {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 11px;
+}
+[data-theme="dark"] .mv2-stat { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-stat-lbl {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: #6b7280; margin-bottom: 4px;
+}
+[data-theme="dark"] .mv2-stat-lbl { color: #9ca3af; }
+.mv2-stat-val { font-size: 15px; font-weight: 700; }
+.mv2-stat-lbl [data-lucide] { width: 13px; height: 13px; }
+
+/* SECTION TITLE */
+.mv2-sectitle {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; font-weight: 700;
+  margin: 14px 2px 8px;
+}
+.mv2-sectitle a { font-size: 11px; color: #4f46e5; cursor: pointer; font-weight: 600; }
+[data-theme="dark"] .mv2-sectitle a { color: #818cf8; }
+
+/* QUICK ACTIONS */
+.mv2-qactions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.mv2-qa { text-align: center; background: none; border: none; padding: 0; cursor: pointer; }
+.mv2-qa-ic {
+  background: #fff; border: 1px solid #e5e7eb;
+  width: 52px; height: 52px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 6px;
+  color: #4f46e5;
+}
+[data-theme="dark"] .mv2-qa-ic { background: #1c1c1e; border-color: #2c2c2e; color: #818cf8; }
+.mv2-qa-ic [data-lucide] { width: 22px; height: 22px; }
+.mv2-qa-lbl { font-size: 10px; color: #374151; }
+[data-theme="dark"] .mv2-qa-lbl { color: #d1d5db; }
+
+/* INSIGHT */
+.mv2-insight {
+  background: #ede9fe; border-radius: 14px;
+  padding: 13px; display: flex; gap: 12px; align-items: start;
+  margin-bottom: 14px;
+}
+[data-theme="dark"] .mv2-insight { background: #1e1b4b; border: 1px solid #312e81; }
+.mv2-insight [data-lucide] { width: 20px; height: 20px; color: #7c3aed; margin-top: 1px; flex-shrink: 0; }
+[data-theme="dark"] .mv2-insight [data-lucide] { color: #a78bfa; }
+.mv2-insight-t { font-size: 11px; font-weight: 700; color: #4c1d95; margin-bottom: 3px; }
+[data-theme="dark"] .mv2-insight-t { color: #c4b5fd; }
+.mv2-insight-m { font-size: 12px; color: #5b21b6; line-height: 1.45; }
+[data-theme="dark"] .mv2-insight-m { color: #a5b4fc; }
+
+/* LIST CARDS */
+.mv2-listcard {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; overflow: hidden;
+}
+[data-theme="dark"] .mv2-listcard { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-li {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  background: none; border-left: none; border-right: none; border-top: none;
+  width: 100%; text-align: left;
+  color: inherit;
+}
+[data-theme="dark"] .mv2-li { border-bottom-color: #2c2c2e; }
+.mv2-li:last-child { border-bottom: none; }
+.mv2-li-ic {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.mv2-li-ic [data-lucide] { width: 17px; height: 17px; }
+.mv2-li-main { flex: 1; min-width: 0; }
+.mv2-li-t { font-size: 12px; font-weight: 600; }
+.mv2-li-s { font-size: 10px; color: #6b7280; margin-top: 2px; }
+[data-theme="dark"] .mv2-li-s { color: #9ca3af; }
+.mv2-li-r { text-align: right; }
+.mv2-li-amt { font-size: 13px; font-weight: 700; }
+.mv2-li-amt.gain { color: #10b981; }
+.mv2-li-amt.loss { color: #ef4444; }
+
+/* Icon color variants */
+.mv2-ic-red { background: #fee2e2; color: #dc2626; }
+.mv2-ic-green { background: #d1fae5; color: #059669; }
+.mv2-ic-blue { background: #dbeafe; color: #2563eb; }
+.mv2-ic-amber { background: #fef3c7; color: #d97706; }
+.mv2-ic-purple { background: #ede9fe; color: #7c3aed; }
+.mv2-ic-gray { background: #f3f4f6; color: #4b5563; }
+[data-theme="dark"] .mv2-ic-red { background: #7f1d1d; color: #fca5a5; }
+[data-theme="dark"] .mv2-ic-green { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .mv2-ic-blue { background: #1e3a8a; color: #93c5fd; }
+[data-theme="dark"] .mv2-ic-amber { background: #78350f; color: #fcd34d; }
+[data-theme="dark"] .mv2-ic-purple { background: #4c1d95; color: #c4b5fd; }
+[data-theme="dark"] .mv2-ic-gray { background: #1f2937; color: #d1d5db; }
+
+/* PILLS (sub-tabs) */
+.mv2-pills {
+  display: flex; gap: 6px; overflow-x: auto;
+  padding: 6px 16px 12px;
+  scrollbar-width: none;
+}
+.mv2-pills::-webkit-scrollbar { display: none; }
+.mv2-pill {
+  background: #fff; color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 7px 14px; border-radius: 18px;
+  font-size: 12px; font-weight: 600;
+  white-space: nowrap; cursor: pointer;
+}
+[data-theme="dark"] .mv2-pill { background: #1c1c1e; border-color: #2c2c2e; color: #d1d5db; }
+.mv2-pill.active { background: #111; color: #fff; border-color: #111; }
+[data-theme="dark"] .mv2-pill.active { background: #fff; color: #000; border-color: #fff; }
+
+/* MONEY summary */
+.mv2-sum {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 13px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+[data-theme="dark"] .mv2-sum { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-sum-lbl { font-size: 10px; color: #6b7280; }
+[data-theme="dark"] .mv2-sum-lbl { color: #9ca3af; }
+.mv2-sum-val { font-size: 19px; font-weight: 700; margin-top: 2px; }
+.mv2-sum-sub { font-size: 14px; font-weight: 600; }
+
+/* MONEY card item */
+.mv2-mcard {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 12px;
+  margin-bottom: 10px; cursor: pointer;
+}
+[data-theme="dark"] .mv2-mcard { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-mcard-row { display: flex; align-items: center; gap: 10px; }
+.mv2-mcard-meta {
+  display: flex; justify-content: space-between; gap: 8px;
+  padding-top: 8px; margin-top: 10px;
+  border-top: 1px solid #f3f4f6;
+  font-size: 10px; color: #6b7280;
+}
+[data-theme="dark"] .mv2-mcard-meta { border-top-color: #2c2c2e; color: #9ca3af; }
+
+/* HEALTH GAUGE (Reports tab) */
+.mv2-gauge-card {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 18px; padding: 20px; text-align: center;
+  margin-bottom: 12px;
+}
+[data-theme="dark"] .mv2-gauge-card { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-gauge-score { font-size: 36px; font-weight: 700; margin-top: -10px; }
+.mv2-gauge-score small { font-size: 14px; color: #6b7280; font-weight: 400; }
+.mv2-gauge-pill {
+  display: inline-block;
+  background: #d1fae5; color: #047857;
+  font-size: 10px; padding: 4px 12px;
+  border-radius: 10px; font-weight: 700; margin-top: 6px;
+}
+
+/* MORE tab */
+.mv2-more-prof {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 16px; padding: 14px; margin-bottom: 16px;
+}
+[data-theme="dark"] .mv2-more-prof { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-more-prof-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.mv2-more-prof-av {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: #4f46e5; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700;
+  flex-shrink: 0;
+}
+.mv2-more-prof-name { font-size: 14px; font-weight: 700; }
+.mv2-more-prof-meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+[data-theme="dark"] .mv2-more-prof-meta { color: #9ca3af; }
+.mv2-more-prof-actions {
+  display: flex; gap: 6px; padding-top: 10px;
+  border-top: 1px solid #f3f4f6;
+}
+[data-theme="dark"] .mv2-more-prof-actions { border-top-color: #2c2c2e; }
+.mv2-more-btn {
+  flex: 1; background: #f7f5ef; border: 1px solid #e5e7eb;
+  color: #111; padding: 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+[data-theme="dark"] .mv2-more-btn { background: #0a0a0a; border-color: #2c2c2e; color: #fff; }
+.mv2-more-btn [data-lucide] { width: 14px; height: 14px; }
+.mv2-more-seclbl {
+  font-size: 10px; font-weight: 700;
+  color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 0 4px 6px; margin-top: 4px;
+}
+[data-theme="dark"] .mv2-more-seclbl { color: #9ca3af; }
+.mv2-more-list {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; margin-bottom: 14px; overflow: hidden;
+}
+[data-theme="dark"] .mv2-more-list { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-more-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer; background: none;
+  border-left: none; border-right: none; border-top: none;
+  width: 100%; text-align: left;
+  font-size: 13px; font-weight: 500; color: inherit;
+}
+[data-theme="dark"] .mv2-more-item { border-bottom-color: #2c2c2e; }
+.mv2-more-item:last-child { border-bottom: none; }
+.mv2-more-item .lead { width: 18px; height: 18px; flex-shrink: 0; }
+.mv2-more-item .label { flex: 1; }
+.mv2-more-item .chev { width: 16px; height: 16px; color: #9ca3af; }
+.mv2-more-badge {
+  background: #ede9fe; color: #6d28d9;
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 8px; font-weight: 700;
+}
+[data-theme="dark"] .mv2-more-badge { background: #312e81; color: #c4b5fd; }
+
+/* BOTTOM NAV */
+.mv2-bnav {
+  background: #fff; border-top: 1px solid #e5e7eb;
+  padding: 8px 12px calc(14px + env(safe-area-inset-bottom));
+  display: flex; justify-content: space-around; align-items: center;
+}
+[data-theme="dark"] .mv2-bnav { background: #000; border-top-color: #2c2c2e; }
+.mv2-bn-tab {
+  text-align: center; background: none; border: none; padding: 4px 8px;
+  color: #9ca3af; cursor: pointer; flex: 1;
+}
+.mv2-bn-tab [data-lucide] { width: 22px; height: 22px; }
+.mv2-bn-tab-lbl { font-size: 10px; font-weight: 500; margin-top: 2px; }
+.mv2-bn-tab.active { color: #4f46e5; }
+.mv2-bn-tab.active .mv2-bn-tab-lbl { font-weight: 700; }
+[data-theme="dark"] .mv2-bn-tab.active { color: #818cf8; }
+.mv2-bn-fab {
+  background: #4f46e5; color: #fff; border: none;
+  width: 50px; height: 50px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: -16px;
+  box-shadow: 0 6px 14px rgba(79,70,229,0.35);
+  cursor: pointer; flex-shrink: 0;
+}
+.mv2-bn-fab [data-lucide] { width: 26px; height: 26px; }
+
+/* BACK BUTTON (when viewing non-tab pages) */
+#mv2BackBtn {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  left: 12px;
+  z-index: 999;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid #e5e7eb;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #111;
+}
+#mv2BackBtn [data-lucide] { width: 20px; height: 20px; }
+[data-theme="dark"] #mv2BackBtn { background: rgba(28,28,30,0.9); border-color: #2c2c2e; color: #fff; }
+
+/* Hide old topbar in page mode (it shows hamburger which we don't need) */
+body.mv2.mv2-page-mode .topbar { padding-left: 64px; }
+
 </style>
 </head>
 <body>
@@ -9340,6 +9723,519 @@ window.addEventListener('load', () => {
     checkAndScheduleAlertNotifications().catch(() => {});
   }, 2000);
 });
+
+/* ============================================================
+   MOBILE V2 — APK-style mobile UI takeover
+============================================================ */
+const MV2_BP = 768;
+let mv2State = { tab: 'home', moneySub: 'accounts', ready: false, hiddenForPage: false, lastTab: 'home' };
+
+function mv2IsMobile() { return window.innerWidth <= MV2_BP; }
+
+function mv2Init() {
+  if (!mv2IsMobile()) {
+    document.body.classList.remove('mv2', 'mv2-page-mode');
+    return;
+  }
+  // Only activate after a profile is entered or in offline mode
+  const ready = (typeof cloud !== 'undefined' && cloud.activeProfileId) || (typeof state !== 'undefined' && state.settings);
+  if (!ready) return;
+  document.body.classList.add('mv2');
+  if (!mv2State.ready) { mv2BuildShell(); mv2State.ready = true; }
+  if (!mv2State.hiddenForPage) mv2Render();
+}
+
+function mv2BuildShell() {
+  if (document.getElementById('mv2Shell')) return;
+  const shell = document.createElement('div');
+  shell.id = 'mv2Shell';
+  shell.className = 'mv2-shell';
+  shell.innerHTML = `<header id="mv2Header"></header><div id="mv2Body" class="mv2-body"></div><nav id="mv2BottomNav" class="mv2-bnav"></nav>`;
+  document.body.appendChild(shell);
+  // Back button (used in page mode)
+  const bbtn = document.createElement('button');
+  bbtn.id = 'mv2BackBtn';
+  bbtn.innerHTML = '<i data-lucide="arrow-left"></i>';
+  bbtn.onclick = mv2RestoreShell;
+  document.body.appendChild(bbtn);
+}
+
+function mv2Render() {
+  mv2RenderHeader();
+  mv2RenderBNav();
+  mv2RenderBody();
+  if (window.lucide) lucide.createIcons();
+}
+
+function mv2RenderHeader() {
+  const h = document.getElementById('mv2Header'); if (!h) return;
+  const active = (typeof cloud !== 'undefined' && cloud.profiles) ? cloud.profiles.find(p => p.id === cloud.activeProfileId) : null;
+  const userEmail = (typeof cloud !== 'undefined' && cloud.user) ? cloud.user.email : '';
+  const userName = (active?.name) || (userEmail ? userEmail.split('@')[0] : 'You');
+  const initials = (active?.name || userName).slice(0,2).toUpperCase();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  let alertCount = 0;
+  try { if (typeof computeAlerts === 'function') alertCount = computeAlerts().length; } catch(e){}
+
+  if (mv2State.tab === 'home') {
+    h.innerHTML = `
+      <div class="mv2-header">
+        <div class="mv2-avatar">${escapeHTML(initials)}</div>
+        <div class="mv2-greeting">
+          <div class="mv2-greeting-small">${greeting}</div>
+          <div class="mv2-greeting-name">${escapeHTML(userName)}</div>
+        </div>
+        <button class="mv2-iconbtn" onclick="mv2OpenAlerts(event)">
+          <i data-lucide="bell"></i>${alertCount > 0 ? '<span class="badge-dot"></span>' : ''}
+        </button>
+      </div>
+      ${active ? `<button class="mv2-profile-chip" onclick="mv2OpenProfileSwitch()">
+        <span class="mv2-pc-avatar">${escapeHTML(active.name.charAt(0).toUpperCase())}</span>
+        <span>${escapeHTML(active.name)}</span>
+        <i data-lucide="chevron-down"></i>
+      </button>` : ''}`;
+  } else {
+    const titleMap = { money: 'Money', reports: 'Reports', more: 'More' };
+    h.innerHTML = `<div class="mv2-pagetitle">${titleMap[mv2State.tab] || ''}</div>`;
+  }
+}
+
+function mv2RenderBNav() {
+  const nav = document.getElementById('mv2BottomNav'); if (!nav) return;
+  const tabs = [
+    { id: 'home', icon: 'home', label: 'Home' },
+    { id: 'money', icon: 'wallet', label: 'Money' },
+    { id: '__fab__' },
+    { id: 'reports', icon: 'pie-chart', label: 'Reports' },
+    { id: 'more', icon: 'menu', label: 'More' }
+  ];
+  nav.innerHTML = tabs.map(t => {
+    if (t.id === '__fab__') return `<button class="mv2-bn-fab" onclick="mv2OpenAddSheet()"><i data-lucide="plus"></i></button>`;
+    const active = mv2State.tab === t.id ? 'active' : '';
+    return `<button class="mv2-bn-tab ${active}" onclick="mv2GoTab('${t.id}')"><i data-lucide="${t.icon}"></i><div class="mv2-bn-tab-lbl">${t.label}</div></button>`;
+  }).join('');
+}
+
+function mv2GoTab(tab) {
+  mv2State.tab = tab; mv2State.lastTab = tab;
+  mv2Render();
+  const b = document.getElementById('mv2Body'); if (b) b.scrollTop = 0;
+}
+
+function mv2OpenAddSheet() {
+  if (typeof openTxnModal === 'function') openTxnModal();
+}
+
+function mv2OpenAlerts() {
+  // Try existing notification dropdown, else open transactions page
+  if (typeof toggleNotificationDropdown === 'function') { toggleNotificationDropdown(); return; }
+  if (typeof openNotificationDropdown === 'function') { openNotificationDropdown(); return; }
+  // Fallback: show alerts in a simple sheet
+  try {
+    const alerts = (typeof computeAlerts === 'function') ? computeAlerts() : [];
+    let html = alerts.length ? alerts.map(a => `<div style="padding:12px;border-bottom:1px solid var(--border);"><div style="font-size:13px;">${a.msg}</div></div>`).join('') : '<div style="padding:24px;text-align:center;color:var(--text-tertiary);">No alerts</div>';
+    if (typeof openModal === 'function') openModal('Notifications', `<div style="margin:-16px;">${html}</div>`);
+  } catch(e){}
+}
+
+function mv2OpenProfileSwitch() {
+  if (typeof toggleProfileMenu === 'function') { toggleProfileMenu(); return; }
+  if (typeof renderProfilePicker === 'function') {
+    mv2NavigateToPage('settings');
+  }
+}
+
+function mv2RenderBody() {
+  const body = document.getElementById('mv2Body'); if (!body) return;
+  const renderers = { home: mv2Home, money: mv2Money, reports: mv2Reports, more: mv2More };
+  (renderers[mv2State.tab] || mv2Home)(body);
+}
+
+/* ====== HOME ====== */
+function mv2Home(body) {
+  const nw = (typeof getNetWorth === 'function') ? getNetWorth() : 0;
+  // Month totals
+  const now = new Date();
+  const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  const mTxns = (state.transactions || []).filter(t => t.status !== 'Draft' && t.date >= ms);
+  const income = mTxns.filter(t => t.type === 'Income').reduce((s,t) => s + +t.amount, 0);
+  const expense = mTxns.filter(t => t.type === 'Expense').reduce((s,t) => s + +t.amount, 0);
+  // Last month for comparison
+  const lmStart = new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString().slice(0,10);
+  const lmExpense = (state.transactions || []).filter(t => t.status !== 'Draft' && t.type === 'Expense' && t.date >= lmStart && t.date < ms).reduce((s,t) => s + +t.amount, 0);
+  let insight = `Add transactions to start seeing insights.`;
+  if (income > 0) {
+    const rate = Math.round((income - expense) / income * 100);
+    insight = `Your savings rate this month is ${rate}%.`;
+  }
+  if (lmExpense > 0 && expense > 0) {
+    const diff = expense - lmExpense;
+    if (Math.abs(diff) > lmExpense * 0.05) {
+      insight = diff > 0 ? `You're spending ${fmt(diff)} more than last month so far.` : `You're spending ${fmt(-diff)} less than last month — keep it up!`;
+    }
+  }
+  // Recent transactions
+  const recent = [...(state.transactions || [])].filter(t => t.status !== 'Draft').sort((a,b) => (b.date || '').localeCompare(a.date || '')).slice(0, 5);
+
+  body.innerHTML = `
+    <div class="mv2-hero">
+      <div class="mv2-hero-row">
+        <span>Net worth</span>
+        <span class="${nw >= 0 ? 'pos' : 'neg'}">${nw >= 0 ? 'Positive' : 'Negative'}</span>
+      </div>
+      <div class="mv2-hero-amt">${fmt(nw)}</div>
+      <svg class="mv2-hero-spark" viewBox="0 0 200 30" preserveAspectRatio="none">${mv2Spark()}</svg>
+    </div>
+    <div class="mv2-stats">
+      <div class="mv2-stat">
+        <div class="mv2-stat-lbl"><i data-lucide="arrow-down-left" style="color:#10b981;"></i>Income</div>
+        <div class="mv2-stat-val">${fmt(income)}</div>
+      </div>
+      <div class="mv2-stat">
+        <div class="mv2-stat-lbl"><i data-lucide="arrow-up-right" style="color:#ef4444;"></i>Expense</div>
+        <div class="mv2-stat-val">${fmt(expense)}</div>
+      </div>
+    </div>
+    <div class="mv2-sectitle"><span>Quick actions</span></div>
+    <div class="mv2-qactions">
+      <button class="mv2-qa" onclick="mv2OpenAddSheet()"><div class="mv2-qa-ic"><i data-lucide="plus"></i></div><div class="mv2-qa-lbl">Add</div></button>
+      <button class="mv2-qa" onclick="mv2GoTab('money');setTimeout(()=>mv2SetMoneySub('cards'),50)"><div class="mv2-qa-ic"><i data-lucide="credit-card"></i></div><div class="mv2-qa-lbl">Pay card</div></button>
+      <button class="mv2-qa" onclick="mv2OpenTransfer()"><div class="mv2-qa-ic"><i data-lucide="arrow-left-right"></i></div><div class="mv2-qa-lbl">Transfer</div></button>
+      <button class="mv2-qa" onclick="mv2NavigateToPage('recurring')"><div class="mv2-qa-ic"><i data-lucide="receipt"></i></div><div class="mv2-qa-lbl">Bills</div></button>
+    </div>
+    <div class="mv2-insight">
+      <i data-lucide="sparkles"></i>
+      <div><div class="mv2-insight-t">Smart insight</div><div class="mv2-insight-m">${escapeHTML(insight)}</div></div>
+    </div>
+    <div class="mv2-sectitle"><span>Recent activity</span><a onclick="mv2NavigateToPage('transactions')">See all</a></div>
+    <div class="mv2-listcard">
+      ${recent.length === 0 ? '<div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:20px;display:flex;">No transactions yet</div>' : recent.map(mv2TxnRow).join('')}
+    </div>`;
+}
+
+function mv2Spark() {
+  const snaps = ((state.netWorthSnapshots) || []).slice(-30).sort((a,b) => a.date.localeCompare(b.date));
+  if (snaps.length < 2) return '<polyline points="0,15 200,15" fill="none" stroke="#818cf8" stroke-width="2"/>';
+  const vals = snaps.map(s => +s.netWorth);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = max - min || 1;
+  const pts = vals.map((v,i) => `${((i/(vals.length-1))*200).toFixed(1)},${(28 - ((v-min)/range)*24).toFixed(1)}`).join(' ');
+  return `<polyline points="${pts}" fill="none" stroke="#818cf8" stroke-width="2" stroke-linejoin="round"/>`;
+}
+
+function mv2TxnRow(t) {
+  const isInc = t.type === 'Income';
+  const isTr = t.type === 'Internal Transfer';
+  const isCard = t.type === 'Card Settlement';
+  const cat = (state.categories || []).find(c => c.id === t.categoryId);
+  const catName = cat?.name || (isTr ? 'Transfer' : isCard ? 'Card payment' : 'Other');
+  const icon = isInc ? 'briefcase' : isTr ? 'arrow-left-right' : isCard ? 'credit-card' : (cat?.icon || 'shopping-bag');
+  const icCls = isInc ? 'mv2-ic-green' : isTr ? 'mv2-ic-blue' : isCard ? 'mv2-ic-purple' : 'mv2-ic-red';
+  const sign = isInc ? '+' : (isTr ? '' : '−');
+  return `<button class="mv2-li" onclick="mv2NavigateToPage('transactions')">
+    <div class="mv2-li-ic ${icCls}"><i data-lucide="${icon}"></i></div>
+    <div class="mv2-li-main"><div class="mv2-li-t">${escapeHTML(t.payee || catName)}</div><div class="mv2-li-s">${escapeHTML(catName)} · ${mv2RelDate(t.date)}</div></div>
+    <div class="mv2-li-r"><div class="mv2-li-amt ${isInc?'gain':''}">${sign}${fmt(t.amount)}</div></div>
+  </button>`;
+}
+
+function mv2RelDate(s) {
+  if (!s) return '';
+  const d = new Date(s); const t = new Date(); t.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  const diff = Math.round((t - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff > 0 && diff < 7) return `${diff}d ago`;
+  return (typeof fmtDate === 'function') ? fmtDate(s) : s;
+}
+
+function mv2OpenTransfer() {
+  if (typeof openTxnModal === 'function') {
+    openTxnModal();
+    setTimeout(() => {
+      const sel = document.getElementById('txnType');
+      if (sel) { sel.value = 'Internal Transfer'; sel.dispatchEvent(new Event('change')); }
+    }, 80);
+  }
+}
+
+/* ====== MONEY ====== */
+function mv2Money(body) {
+  body.innerHTML = `
+    <div class="mv2-pills" id="mv2MoneyPills">
+      ${[['accounts','Accounts'],['cards','Cards'],['loans','Loans'],['investments','Invest'],['insurance','Insurance']].map(([id,lbl]) =>
+        `<button class="mv2-pill ${mv2State.moneySub === id ? 'active' : ''}" onclick="mv2SetMoneySub('${id}')">${lbl}</button>`
+      ).join('')}
+    </div>
+    <div id="mv2MoneyBody" style="padding:0 16px;"></div>`;
+  mv2RenderMoneySub();
+}
+
+function mv2SetMoneySub(sub) {
+  mv2State.moneySub = sub;
+  document.querySelectorAll('#mv2MoneyPills .mv2-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#mv2MoneyPills .mv2-pill').forEach(p => {
+    if (p.getAttribute('onclick')?.includes(`'${sub}'`)) p.classList.add('active');
+  });
+  mv2RenderMoneySub();
+}
+
+function mv2RenderMoneySub() {
+  const body = document.getElementById('mv2MoneyBody'); if (!body) return;
+  const sub = mv2State.moneySub;
+  let html = '';
+  if (sub === 'accounts') {
+    const list = (state.accounts || []).filter(a => a.status === 'Active');
+    const total = list.reduce((s,a) => s + +a.balance, 0);
+    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total balance</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Accounts</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
+    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No accounts yet</div></div>' : list.map(mv2AcctCard).join('');
+    html += `<button class="mv2-mcard" style="background:#4f46e5;color:#fff;border:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;margin-top:10px;" onclick="mv2NavigateToPage('accounts')"><i data-lucide="plus" style="width:16px;height:16px;"></i>Add account</button>`;
+  } else if (sub === 'cards') {
+    const list = (state.cards || []).filter(c => c.status !== 'Closed');
+    const total = list.reduce((s,c) => s + (typeof getCardOutstanding === 'function' ? getCardOutstanding(c.id) : 0), 0);
+    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total outstanding</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Cards</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
+    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No credit cards</div></div>' : list.map(mv2CardCard).join('');
+  } else if (sub === 'loans') {
+    const list = (state.loans || []).filter(l => l.status === 'Active');
+    const total = list.reduce((s,l) => s + +l.outstanding, 0);
+    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total outstanding</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Loans</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
+    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No active loans</div></div>' : list.map(mv2LoanCard).join('');
+  } else if (sub === 'investments') {
+    const list = (state.investments || []).filter(i => i.status !== 'Closed');
+    const total = list.reduce((s,i) => s + +(i.currentValue || i.invested || 0), 0);
+    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Portfolio value</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Holdings</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
+    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No investments yet</div></div>' : list.map(mv2InvCard).join('');
+  } else if (sub === 'insurance') {
+    const list = (state.insurance || []).filter(p => p.status === 'Active');
+    const cover = list.reduce((s,p) => s + +(p.sumAssured || 0), 0);
+    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total cover</div><div class="mv2-sum-val">${fmt(cover)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Policies</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
+    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No policies</div></div>' : list.map(mv2InsCard).join('');
+  }
+  body.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+}
+
+function mv2AcctCard(a) {
+  const last4 = a.last4 || (a.accountNumber || '').slice(-4);
+  const ic = {'Savings':'mv2-ic-red','Current':'mv2-ic-blue','Salary':'mv2-ic-amber','Fixed Deposit':'mv2-ic-purple','Recurring Deposit':'mv2-ic-green'}[a.type] || 'mv2-ic-gray';
+  let ambStat = '', ambClr = '#9ca3af';
+  if (a.minAMB && a.amb) {
+    const ok = +a.amb >= +a.minAMB;
+    ambStat = ok ? 'Above min' : 'Below min';
+    ambClr = ok ? '#10b981' : '#ef4444';
+  }
+  return `<div class="mv2-mcard" onclick="mv2NavigateToPage('accounts')">
+    <div class="mv2-mcard-row">
+      <div class="mv2-li-ic ${ic}"><i data-lucide="building-2"></i></div>
+      <div style="flex:1;min-width:0;"><div class="mv2-li-t">${escapeHTML(a.bank || a.name)}</div><div class="mv2-li-s">${escapeHTML(a.name)}${last4 ? ' · XXXX ' + last4 : ''}</div></div>
+      <div style="text-align:right;"><div style="font-size:14px;font-weight:700;">${fmt(a.balance)}</div></div>
+    </div>
+    ${(a.amb || a.aqb) ? `<div class="mv2-mcard-meta">${a.amb ? `<span>AMB: ${fmt(a.amb)}</span>` : ''}${a.aqb ? `<span>AQB: ${fmt(a.aqb)}</span>` : ''}${ambStat ? `<span style="color:${ambClr};">${ambStat}</span>` : ''}</div>` : ''}
+  </div>`;
+}
+
+function mv2CardCard(c) {
+  const out = typeof getCardOutstanding === 'function' ? getCardOutstanding(c.id) : 0;
+  const last4 = c.last4 || (c.cardNumber || '').slice(-4);
+  return `<div class="mv2-mcard" onclick="mv2NavigateToPage('cards')"><div class="mv2-mcard-row">
+    <div class="mv2-li-ic mv2-ic-purple"><i data-lucide="credit-card"></i></div>
+    <div style="flex:1;min-width:0;"><div class="mv2-li-t">${escapeHTML(c.issuer || c.name)}</div><div class="mv2-li-s">${escapeHTML(c.name)}${last4 ? ' · XXXX ' + last4 : ''}</div></div>
+    <div style="text-align:right;"><div style="font-size:14px;font-weight:700;">${fmt(out)}</div><div style="font-size:10px;color:#9ca3af;">outstanding</div></div>
+  </div></div>`;
+}
+
+function mv2LoanCard(l) {
+  return `<div class="mv2-mcard" onclick="mv2NavigateToPage('loans')"><div class="mv2-mcard-row">
+    <div class="mv2-li-ic mv2-ic-red"><i data-lucide="landmark"></i></div>
+    <div style="flex:1;min-width:0;"><div class="mv2-li-t">${escapeHTML(l.lender || l.name)}</div><div class="mv2-li-s">${escapeHTML(l.type || 'Loan')} · EMI ${fmt(l.emi)}</div></div>
+    <div style="text-align:right;"><div style="font-size:14px;font-weight:700;">${fmt(l.outstanding)}</div><div style="font-size:10px;color:#9ca3af;">left</div></div>
+  </div></div>`;
+}
+
+function mv2InvCard(i) {
+  const gain = (+(i.currentValue || 0)) - (+(i.invested || 0));
+  const pct = i.invested > 0 ? Math.round(gain / +i.invested * 100) : 0;
+  return `<div class="mv2-mcard" onclick="mv2NavigateToPage('investments')"><div class="mv2-mcard-row">
+    <div class="mv2-li-ic mv2-ic-green"><i data-lucide="trending-up"></i></div>
+    <div style="flex:1;min-width:0;"><div class="mv2-li-t">${escapeHTML(i.name)}</div><div class="mv2-li-s">${escapeHTML(i.type || 'Investment')} · ${fmt(i.invested)} in</div></div>
+    <div style="text-align:right;"><div style="font-size:14px;font-weight:700;">${fmt(i.currentValue || i.invested)}</div><div style="font-size:10px;color:${gain >= 0 ? '#10b981' : '#ef4444'};">${gain >= 0 ? '+' : ''}${pct}%</div></div>
+  </div></div>`;
+}
+
+function mv2InsCard(p) {
+  return `<div class="mv2-mcard" onclick="mv2NavigateToPage('insurance')"><div class="mv2-mcard-row">
+    <div class="mv2-li-ic mv2-ic-blue"><i data-lucide="shield-check"></i></div>
+    <div style="flex:1;min-width:0;"><div class="mv2-li-t">${escapeHTML(p.policyName || p.insurer)}</div><div class="mv2-li-s">${escapeHTML(p.type || 'Policy')} · Premium ${fmt(p.premium)}</div></div>
+    <div style="text-align:right;"><div style="font-size:14px;font-weight:700;">${fmt(p.sumAssured)}</div><div style="font-size:10px;color:#9ca3af;">cover</div></div>
+  </div></div>`;
+}
+
+/* ====== REPORTS ====== */
+function mv2Reports(body) {
+  // Try to compute health score from existing function
+  let score = 0, scoreCount = 0;
+  try {
+    if (typeof computeFinancialHealthScore === 'function') {
+      const r = computeFinancialHealthScore();
+      score = r.score || 0; scoreCount = r.ratios?.length || 0;
+    }
+  } catch(e){}
+  // Heuristic if no function
+  if (!score) {
+    const nw = (typeof getNetWorth === 'function') ? getNetWorth() : 0;
+    score = nw > 0 ? 65 : 35; scoreCount = 8;
+  }
+  const pct = Math.max(0, Math.min(100, score));
+  const arcAngle = (pct / 100) * 180; // 180deg sweep
+  const x = 50 + 40 * Math.cos((180 - arcAngle) * Math.PI / 180);
+  const y = 50 - 40 * Math.sin((180 - arcAngle) * Math.PI / 180);
+  const largeArc = arcAngle > 180 ? 1 : 0;
+  const stat = score >= 75 ? { lbl: 'Excellent', clr: '#10b981', bg: '#d1fae5' } : score >= 60 ? { lbl: 'Good', clr: '#10b981', bg: '#d1fae5' } : score >= 40 ? { lbl: 'Fair', clr: '#d97706', bg: '#fef3c7' } : { lbl: 'Needs work', clr: '#dc2626', bg: '#fee2e2' };
+
+  // Quick stats
+  const nw = (typeof getNetWorth === 'function') ? getNetWorth() : 0;
+  const liquid = (typeof getTotalLiquid === 'function') ? getTotalLiquid() : 0;
+  const liab = (typeof getTotalLiabilities === 'function') ? getTotalLiabilities() : 0;
+  const inv = (typeof getTotalInvestments === 'function') ? getTotalInvestments() : 0;
+  const now = new Date();
+  const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  const mTxns = (state.transactions || []).filter(t => t.status !== 'Draft' && t.date >= ms);
+  const income = mTxns.filter(t => t.type === 'Income').reduce((s,t) => s + +t.amount, 0);
+  const expense = mTxns.filter(t => t.type === 'Expense').reduce((s,t) => s + +t.amount, 0);
+  const monthlyExp = expense || 1;
+  const emergencyMonths = liquid / monthlyExp;
+  const savRate = income > 0 ? Math.round((income - expense) / income * 100) : 0;
+  const debtRatio = income > 0 ? Math.round(liab / (income * 12) * 100) : 0;
+  const invRatio = (liquid + inv) > 0 ? Math.round(inv / (liquid + inv) * 100) : 0;
+
+  body.innerHTML = `
+    <div class="mv2-gauge-card">
+      <div style="font-size:11px;color:#6b7280;margin-bottom:8px;">Financial health score</div>
+      <svg viewBox="0 0 100 60" style="width:160px;height:96px;">
+        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e5e7eb" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 10 50 A 40 40 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="${stat.clr}" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <div class="mv2-gauge-score">${score}<small>/100</small></div>
+      <div class="mv2-gauge-pill" style="background:${stat.bg};color:${stat.clr};">${stat.lbl}</div>
+    </div>
+    <div class="mv2-stats">
+      <div class="mv2-stat"><div class="mv2-stat-lbl">Savings rate</div><div class="mv2-stat-val">${savRate}%</div><div style="font-size:9px;color:${savRate >= 20 ? '#10b981' : '#d97706'};margin-top:2px;">${savRate >= 20 ? 'Healthy' : 'Build it up'}</div></div>
+      <div class="mv2-stat"><div class="mv2-stat-lbl">Debt-to-income</div><div class="mv2-stat-val">${debtRatio}%</div><div style="font-size:9px;color:${debtRatio < 40 ? '#10b981' : '#dc2626'};margin-top:2px;">${debtRatio < 40 ? 'Healthy' : 'High'}</div></div>
+      <div class="mv2-stat"><div class="mv2-stat-lbl">Emergency fund</div><div class="mv2-stat-val">${emergencyMonths.toFixed(1)} mo</div><div style="font-size:9px;color:${emergencyMonths >= 6 ? '#10b981' : '#d97706'};margin-top:2px;">Target: 6 mo</div></div>
+      <div class="mv2-stat"><div class="mv2-stat-lbl">Invested</div><div class="mv2-stat-val">${invRatio}%</div><div style="font-size:9px;color:${invRatio >= 25 ? '#10b981' : '#9ca3af'};margin-top:2px;">of liquid + inv</div></div>
+    </div>
+    <button class="mv2-mcard" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;width:100%;padding:14px;margin-top:6px;" onclick="mv2NavigateToPage('reports')">
+      <div style="display:flex;align-items:center;gap:10px;"><div class="mv2-li-ic mv2-ic-purple"><i data-lucide="bar-chart-3"></i></div><div><div style="font-size:13px;font-weight:600;">Full reports</div><div style="font-size:11px;color:#9ca3af;">14 detailed reports</div></div></div>
+      <i data-lucide="chevron-right" style="width:18px;height:18px;color:#9ca3af;"></i>
+    </button>
+    <button class="mv2-mcard" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;width:100%;padding:14px;" onclick="mv2NavigateToPage('health')">
+      <div style="display:flex;align-items:center;gap:10px;"><div class="mv2-li-ic mv2-ic-green"><i data-lucide="heart-pulse"></i></div><div><div style="font-size:13px;font-weight:600;">All ${scoreCount || 24} ratios</div><div style="font-size:11px;color:#9ca3af;">Detailed health breakdown</div></div></div>
+      <i data-lucide="chevron-right" style="width:18px;height:18px;color:#9ca3af;"></i>
+    </button>
+    <button class="mv2-mcard" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;width:100%;padding:14px;" onclick="mv2NavigateToPage('projection')">
+      <div style="display:flex;align-items:center;gap:10px;"><div class="mv2-li-ic mv2-ic-blue"><i data-lucide="line-chart"></i></div><div><div style="font-size:13px;font-weight:600;">Projection</div><div style="font-size:11px;color:#9ca3af;">Forecast next 60 days</div></div></div>
+      <i data-lucide="chevron-right" style="width:18px;height:18px;color:#9ca3af;"></i>
+    </button>
+  `;
+}
+
+/* ====== MORE ====== */
+function mv2More(body) {
+  const active = (typeof cloud !== 'undefined' && cloud.profiles) ? cloud.profiles.find(p => p.id === cloud.activeProfileId) : null;
+  const userEmail = (typeof cloud !== 'undefined' && cloud.user) ? cloud.user.email : '';
+  const userName = (active?.name) || (userEmail ? userEmail.split('@')[0] : 'You');
+  const initial = (active?.name || userName).charAt(0).toUpperCase();
+  const recurringCount = (state.recurring || []).filter(r => r.active !== false).length;
+
+  const secs = [
+    { lbl: 'Data', items: [
+      { ic: 'users', lbl: 'People', page: 'people', clr: '#4f46e5' },
+      { ic: 'repeat', lbl: 'Recurring templates', page: 'recurring', badge: recurringCount, clr: '#4f46e5' },
+      { ic: 'list', lbl: 'All transactions', page: 'transactions', clr: '#4f46e5' },
+      { ic: 'line-chart', lbl: 'Projection', page: 'projection', clr: '#4f46e5' }
+    ]},
+    { lbl: 'Tools', items: [
+      { ic: 'download', lbl: 'Export & backup', page: 'export', clr: '#10b981' },
+      { ic: 'stethoscope', lbl: 'Diagnose sync', action: 'runSyncDiagnostic', clr: '#10b981' }
+    ]},
+    { lbl: 'Account', items: [
+      { ic: 'settings', lbl: 'Settings', page: 'settings', clr: '#d97706' },
+      ...((typeof cloud !== 'undefined' && cloud.user) ? [{ ic: 'log-out', lbl: 'Sign out', action: 'cloudSignOut', clr: '#ef4444', danger: true }] : [])
+    ]}
+  ];
+
+  body.innerHTML = `
+    <div class="mv2-more-prof">
+      <div class="mv2-more-prof-row">
+        <div class="mv2-more-prof-av">${escapeHTML(initial)}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="mv2-more-prof-name">${escapeHTML(active?.name || userName)}</div>
+          <div class="mv2-more-prof-meta">${escapeHTML(userEmail || 'Local only')}</div>
+        </div>
+      </div>
+      ${(typeof cloud !== 'undefined' && cloud.user) ? `
+        <div class="mv2-more-prof-actions">
+          <button class="mv2-more-btn" onclick="mv2OpenProfileSwitch()"><i data-lucide="arrow-right-left"></i>Switch profile</button>
+          <button class="mv2-more-btn" style="flex:0 0 auto;padding:8px 12px;" onclick="${typeof createNewProfilePrompt === 'function' ? 'createNewProfilePrompt()' : 'mv2NavigateToPage(\\'settings\\')'}"><i data-lucide="plus"></i></button>
+        </div>
+      ` : ''}
+    </div>
+    ${secs.map(s => `
+      <div class="mv2-more-seclbl">${s.lbl}</div>
+      <div class="mv2-more-list">
+        ${s.items.map(it => `
+          <button class="mv2-more-item" onclick="${it.action ? (it.action + '()') : `mv2NavigateToPage('${it.page}')`}">
+            <i data-lucide="${it.ic}" class="lead" style="color:${it.clr};"></i>
+            <span class="label" ${it.danger ? 'style="color:#ef4444;"' : ''}>${escapeHTML(it.lbl)}</span>
+            ${it.badge ? `<span class="mv2-more-badge">${it.badge}</span>` : ''}
+            ${!it.danger ? '<i data-lucide="chevron-right" class="chev"></i>' : ''}
+          </button>`).join('')}
+      </div>`).join('')}
+  `;
+}
+
+/* ====== Navigate to a non-tab page (Settings, People, etc.) ====== */
+function mv2NavigateToPage(pageId) {
+  // Hide mv2 shell, show .app, render the page, add back button
+  mv2State.hiddenForPage = true;
+  document.body.classList.add('mv2-page-mode');
+  if (typeof navigate === 'function') {
+    navigate(pageId);
+  }
+  setTimeout(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, 30);
+  if (window.lucide) lucide.createIcons();
+}
+
+function mv2RestoreShell() {
+  mv2State.hiddenForPage = false;
+  document.body.classList.remove('mv2-page-mode');
+  mv2Render();
+}
+
+/* ====== Resize + Boot ====== */
+window.addEventListener('resize', () => {
+  clearTimeout(window.__mv2RT);
+  window.__mv2RT = setTimeout(mv2Init, 150);
+});
+
+// Hook into renderCurrent so mv2 stays in sync when underlying data changes
+(function() {
+  if (typeof renderCurrent !== 'function') return;
+  const orig = renderCurrent;
+  window.renderCurrent = function() {
+    const r = orig.apply(this, arguments);
+    if (mv2IsMobile() && document.body.classList.contains('mv2') && !mv2State.hiddenForPage) {
+      try { mv2Render(); } catch(e) { console.warn('mv2 render fail:', e); }
+    }
+    return r;
+  };
+})();
+
+// Boot mv2 after main app boots
+window.addEventListener('load', () => setTimeout(mv2Init, 800));
+// Also try again after 2s in case profile loads later
+setTimeout(mv2Init, 2500);
 
 boot().catch(err => {
   console.error('Boot failed:', err);
