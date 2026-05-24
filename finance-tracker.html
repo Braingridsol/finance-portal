@@ -9846,6 +9846,11 @@ function mv2OpenProfileSwitch() {
   }
 }
 
+function mv2NewProfilePrompt() {
+  if (typeof createNewProfilePrompt === 'function') { createNewProfilePrompt(); return; }
+  mv2NavigateToPage('settings');
+}
+
 function mv2RenderBody() {
   const body = document.getElementById('mv2Body'); if (!body) return;
   const renderers = { home: mv2Home, money: mv2Money, reports: mv2Reports, more: mv2More };
@@ -10177,7 +10182,7 @@ function mv2More(body) {
       ${(typeof cloud !== 'undefined' && cloud.user) ? `
         <div class="mv2-more-prof-actions">
           <button class="mv2-more-btn" onclick="mv2OpenProfileSwitch()"><i data-lucide="arrow-right-left"></i>Switch profile</button>
-          <button class="mv2-more-btn" style="flex:0 0 auto;padding:8px 12px;" onclick="${typeof createNewProfilePrompt === 'function' ? 'createNewProfilePrompt()' : 'mv2NavigateToPage(\\'settings\\')'}"><i data-lucide="plus"></i></button>
+          <button class="mv2-more-btn" style="flex:0 0 auto;padding:8px 12px;" onclick="mv2NewProfilePrompt()"><i data-lucide="plus"></i></button>
         </div>
       ` : ''}
     </div>
@@ -10185,7 +10190,7 @@ function mv2More(body) {
       <div class="mv2-more-seclbl">${s.lbl}</div>
       <div class="mv2-more-list">
         ${s.items.map(it => `
-          <button class="mv2-more-item" onclick="${it.action ? (it.action + '()') : `mv2NavigateToPage('${it.page}')`}">
+          <button class="mv2-more-item" onclick="${it.action ? (it.action + '()') : ('mv2NavigateToPage(&#39;' + it.page + '&#39;)')}">
             <i data-lucide="${it.ic}" class="lead" style="color:${it.clr};"></i>
             <span class="label" ${it.danger ? 'style="color:#ef4444;"' : ''}>${escapeHTML(it.lbl)}</span>
             ${it.badge ? `<span class="mv2-more-badge">${it.badge}</span>` : ''}
