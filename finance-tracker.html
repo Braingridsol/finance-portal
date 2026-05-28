@@ -1166,7 +1166,7 @@ body.mv2.mv2-page-mode #mv2BackBtn { display: flex !important; }
 .mv2-hero-amt { position: relative; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
 .mv2-hero-spark { position: relative; width: 100%; height: 26px; }
 
-/* STATS GRID */
+/* STATS GRID (used on Reports + as fallback) */
 .mv2-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
 .mv2-stat {
   background: #fff; border: 1px solid #e5e7eb;
@@ -1180,6 +1180,56 @@ body.mv2.mv2-page-mode #mv2BackBtn { display: flex !important; }
 [data-theme="dark"] .mv2-stat-lbl { color: #9ca3af; }
 .mv2-stat-val { font-size: 15px; font-weight: 700; }
 .mv2-stat-lbl [data-lucide] { width: 13px; height: 13px; }
+
+/* CASHFLOW BANNER (Income | Saved | Expense + bar) */
+.mv2-cf {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 16px; padding: 14px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+[data-theme="dark"] .mv2-cf { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-cf-row {
+  display: flex; justify-content: space-between; align-items: stretch;
+  margin-bottom: 12px;
+}
+.mv2-cf-side { flex: 1; min-width: 0; }
+.mv2-cf-side.right { text-align: right; }
+.mv2-cf-mid {
+  text-align: center;
+  border-left: 1px solid #f3f4f6;
+  border-right: 1px solid #f3f4f6;
+  padding: 0 12px;
+  min-width: 110px;
+}
+[data-theme="dark"] .mv2-cf-mid { border-color: #2c2c2e; }
+.mv2-cf-lbl {
+  font-size: 10px; color: #6b7280;
+  display: flex; align-items: center; gap: 4px;
+}
+[data-theme="dark"] .mv2-cf-lbl { color: #9ca3af; }
+.mv2-cf-side.right .mv2-cf-lbl { justify-content: flex-end; }
+.mv2-cf-mid .mv2-cf-lbl { justify-content: center; }
+.mv2-cf-lbl [data-lucide] { width: 12px; height: 12px; }
+.mv2-cf-val { font-size: 16px; font-weight: 700; margin-top: 2px; }
+.mv2-cf-mid .mv2-cf-val { font-size: 19px; color: #10b981; }
+.mv2-cf-mid .mv2-cf-val.neg { color: #ef4444; }
+.mv2-cf-bar {
+  height: 6px; background: #f3f4f6; border-radius: 3px;
+  overflow: hidden; display: flex;
+}
+[data-theme="dark"] .mv2-cf-bar { background: #2c2c2e; }
+.mv2-cf-bar-inc { background: #10b981; height: 100%; transition: width 0.4s ease; }
+.mv2-cf-bar-exp { background: #fca5a5; height: 100%; transition: width 0.4s ease; }
+.mv2-cf-foot {
+  display: flex; justify-content: space-between;
+  margin-top: 6px; font-size: 9px;
+}
+.mv2-cf-rate { color: #10b981; font-weight: 700; }
+.mv2-cf-rate.low { color: #d97706; }
+.mv2-cf-rate.neg { color: #ef4444; }
+.mv2-cf-compare { color: #6b7280; }
+[data-theme="dark"] .mv2-cf-compare { color: #9ca3af; }
 
 /* SECTION TITLE */
 .mv2-sectitle {
@@ -10422,16 +10472,7 @@ function mv2Home(body) {
       <div class="mv2-hero-amt">${fmt(nw)}</div>
       <svg class="mv2-hero-spark" viewBox="0 0 200 30" preserveAspectRatio="none">${mv2Spark()}</svg>
     </div>
-    <div class="mv2-stats">
-      <div class="mv2-stat">
-        <div class="mv2-stat-lbl"><i data-lucide="arrow-down-left" style="color:#10b981;"></i>Income</div>
-        <div class="mv2-stat-val">${fmt(income)}</div>
-      </div>
-      <div class="mv2-stat">
-        <div class="mv2-stat-lbl"><i data-lucide="arrow-up-right" style="color:#ef4444;"></i>Expense</div>
-        <div class="mv2-stat-val">${fmt(expense)}</div>
-      </div>
-    </div>
+    ${mv2CashflowBanner(income, expense, lmExpense)}
     <div class="mv2-sectitle"><span>Quick actions</span></div>
     <div class="mv2-qactions">
       <button class="mv2-qa" onclick="mv2OpenAddSheet()"><div class="mv2-qa-ic t-txn"><i data-lucide="receipt"></i></div><div class="mv2-qa-lbl">Transaction</div></button>
@@ -10459,6 +10500,180 @@ function mv2Spark() {
   const range = max - min || 1;
   const pts = vals.map((v,i) => `${((i/(vals.length-1))*200).toFixed(1)},${(28 - ((v-min)/range)*24).toFixed(1)}`).join(' ');
   return `<polyline points="${pts}" fill="none" stroke="#818cf8" stroke-width="2" stroke-linejoin="round"/>`;
+}
+
+function mv2CashflowBanner(income, expense, lmExpense) {
+  const saved = income - expense;
+  const lmIncome = (function() {
+    const now = new Date();
+    const lmS = new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString().slice(0,10);
+    const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+    return (state.transactions || []).filter(t => t.status !== 'Draft' && t.type === 'Income' && t.date >= lmS && t.date < ms).reduce((s,t) => s + +t.amount, 0);
+  })();
+  const lmSaved = lmIncome - (lmExpense || 0);
+  // Bar widths: relative split of income vs expense
+  const total = income + expense || 1;
+  const incPct = Math.max(0, Math.min(100, (income / total) * 100));
+  const expPct = 100 - incPct;
+  // Savings rate (saved/income)
+  const rate = income > 0 ? Math.round(saved / income * 100) : 0;
+  const rateClass = rate >= 20 ? '' : (rate >= 0 ? 'low' : 'neg');
+  // Comparison
+  let compare = '';
+  if (lmSaved !== 0) {
+    const diff = saved - lmSaved;
+    if (Math.abs(diff) > 100) compare = `${diff >= 0 ? '+' : '−'}${fmt(Math.abs(diff))} vs last mo`;
+    else compare = 'Even with last mo';
+  } else if (saved > 0) {
+    compare = 'No data last mo';
+  }
+  const savedClass = saved < 0 ? 'neg' : '';
+  const savedDisp = saved >= 0 ? fmt(saved) : '−' + fmt(-saved);
+  return `
+    <div class="mv2-cf" onclick="mv2OpenCashflowSheet()">
+      <div class="mv2-cf-row">
+        <div class="mv2-cf-side">
+          <div class="mv2-cf-lbl"><i data-lucide="arrow-down-left" style="color:#10b981;"></i>Income</div>
+          <div class="mv2-cf-val">${fmt(income)}</div>
+        </div>
+        <div class="mv2-cf-mid">
+          <div class="mv2-cf-lbl">Saved</div>
+          <div class="mv2-cf-val ${savedClass}">${savedDisp}</div>
+        </div>
+        <div class="mv2-cf-side right">
+          <div class="mv2-cf-lbl">Expense<i data-lucide="arrow-up-right" style="color:#ef4444;"></i></div>
+          <div class="mv2-cf-val">${fmt(expense)}</div>
+        </div>
+      </div>
+      <div class="mv2-cf-bar">
+        <div class="mv2-cf-bar-inc" style="width:${incPct.toFixed(1)}%"></div>
+        <div class="mv2-cf-bar-exp" style="width:${expPct.toFixed(1)}%"></div>
+      </div>
+      <div class="mv2-cf-foot">
+        <span class="mv2-cf-rate ${rateClass}">Savings rate ${rate}%</span>
+        <span class="mv2-cf-compare">${compare}</span>
+      </div>
+    </div>
+  `;
+}
+
+function mv2OpenCashflowSheet() {
+  if (!document.getElementById('mv2DetailSheet')) {
+    const bd = document.createElement('div');
+    bd.id = 'mv2DetailBackdrop';
+    bd.className = 'mv2-sheet-backdrop';
+    bd.onclick = mv2CloseDetailSheet;
+    document.body.appendChild(bd);
+    const sh = document.createElement('div');
+    sh.id = 'mv2DetailSheet';
+    sh.className = 'mv2-sheet';
+    document.body.appendChild(sh);
+  }
+  mv2RenderCashflowSheet();
+  requestAnimationFrame(() => {
+    document.getElementById('mv2DetailBackdrop').classList.add('open');
+    document.getElementById('mv2DetailSheet').classList.add('open');
+  });
+}
+
+function mv2RenderCashflowSheet() {
+  const sheet = document.getElementById('mv2DetailSheet'); if (!sheet) return;
+  const now = new Date();
+  const monthLabel = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  const txns = (state.transactions || []).filter(t => t.status !== 'Draft' && t.date >= ms);
+  const income = txns.filter(t => t.type === 'Income').reduce((s,t) => s + +t.amount, 0);
+  const expense = txns.filter(t => t.type === 'Expense').reduce((s,t) => s + +t.amount, 0);
+  const saved = income - expense;
+  const rate = income > 0 ? Math.round(saved / income * 100) : 0;
+
+  // Top spending categories
+  const catTotals = {};
+  txns.filter(t => t.type === 'Expense').forEach(t => {
+    const key = t.category || 'Other';
+    catTotals[key] = (catTotals[key] || 0) + +t.amount;
+  });
+  const topCats = Object.entries(catTotals).sort((a,b) => b[1] - a[1]).slice(0, 5);
+
+  // Top income sources
+  const incTotals = {};
+  txns.filter(t => t.type === 'Income').forEach(t => {
+    const key = t.category || t.payee || 'Other';
+    incTotals[key] = (incTotals[key] || 0) + +t.amount;
+  });
+  const topInc = Object.entries(incTotals).sort((a,b) => b[1] - a[1]).slice(0, 5);
+
+  // Daily totals for sparkline
+  const days = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const dailyInc = new Array(days).fill(0);
+  const dailyExp = new Array(days).fill(0);
+  txns.forEach(t => {
+    const d = new Date(t.date).getDate() - 1;
+    if (d >= 0 && d < days) {
+      if (t.type === 'Income') dailyInc[d] += +t.amount;
+      if (t.type === 'Expense') dailyExp[d] += +t.amount;
+    }
+  });
+  const maxDay = Math.max(...dailyInc, ...dailyExp, 1);
+  const barW = 280 / days;
+  const chartH = 60;
+  const bars = [];
+  for (let i = 0; i < days; i++) {
+    const incH = (dailyInc[i] / maxDay) * (chartH / 2);
+    const expH = (dailyExp[i] / maxDay) * (chartH / 2);
+    if (incH > 0.5) bars.push(`<rect x="${(i*barW + 1).toFixed(1)}" y="${(chartH/2 - incH).toFixed(1)}" width="${(barW-2).toFixed(1)}" height="${incH.toFixed(1)}" fill="#10b981" rx="1"/>`);
+    if (expH > 0.5) bars.push(`<rect x="${(i*barW + 1).toFixed(1)}" y="${(chartH/2).toFixed(1)}" width="${(barW-2).toFixed(1)}" height="${expH.toFixed(1)}" fill="#ef4444" rx="1"/>`);
+  }
+
+  sheet.innerHTML = `
+    <div class="mv2-sheet-handle"></div>
+    <div class="mv2-sheet-titlebar">
+      <div class="mv2-sheet-title">Cashflow · ${monthLabel}</div>
+      <button class="mv2-sheet-close" onclick="mv2CloseDetailSheet()"><i data-lucide="x"></i></button>
+    </div>
+    <div style="text-align:center;padding:4px 0 16px;border-bottom:1px solid #f3f4f6;margin-bottom:14px;">
+      <div style="font-size:11px;color:#6b7280;">Net saved this month</div>
+      <div style="font-size:32px;font-weight:700;color:${saved >= 0 ? '#10b981' : '#ef4444'};">${saved >= 0 ? '+' : '−'}${fmt(Math.abs(saved))}</div>
+      <div style="font-size:11px;color:#6b7280;">${rate}% of income</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div style="background:#d1fae5;border-radius:10px;padding:10px;"><div style="font-size:10px;color:#065f46;font-weight:600;">Income</div><div style="font-size:15px;font-weight:700;color:#065f46;margin-top:2px;">${fmt(income)}</div></div>
+      <div style="background:#fee2e2;border-radius:10px;padding:10px;"><div style="font-size:10px;color:#991b1b;font-weight:600;">Expense</div><div style="font-size:15px;font-weight:700;color:#991b1b;margin-top:2px;">${fmt(expense)}</div></div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Daily pattern</div>
+    <div style="background:#f7f5ef;border-radius:12px;padding:10px;margin-bottom:14px;">
+      <svg viewBox="0 0 280 ${chartH}" style="width:100%;height:50px;">${bars.join('')}<line x1="0" y1="${chartH/2}" x2="280" y2="${chartH/2}" stroke="#e5e7eb" stroke-width="0.5"/></svg>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:#6b7280;">
+        <span style="display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;background:#10b981;border-radius:1px;"></span>Income</span>
+        <span style="display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;background:#ef4444;border-radius:1px;"></span>Expense</span>
+      </div>
+    </div>
+    ${topCats.length ? `
+      <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Top spending</div>
+      <div class="mv2-listcard" style="margin-bottom:14px;">
+        ${topCats.map(([cat, amt]) => {
+          const pct = Math.round(amt / expense * 100);
+          return `<div class="mv2-li" style="cursor:default;display:flex;">
+            <div class="mv2-li-ic mv2-ic-red"><i data-lucide="shopping-bag"></i></div>
+            <div class="mv2-li-main"><div class="mv2-li-t">${escapeHTML(cat)}</div><div class="mv2-li-s">${pct}% of expenses</div></div>
+            <div class="mv2-li-r"><div class="mv2-li-amt">${fmt(amt)}</div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    ` : ''}
+    ${topInc.length ? `
+      <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Top income</div>
+      <div class="mv2-listcard" style="margin-bottom:14px;">
+        ${topInc.map(([cat, amt]) => `<div class="mv2-li" style="cursor:default;display:flex;">
+          <div class="mv2-li-ic mv2-ic-green"><i data-lucide="briefcase"></i></div>
+          <div class="mv2-li-main"><div class="mv2-li-t">${escapeHTML(cat)}</div><div class="mv2-li-s">income</div></div>
+          <div class="mv2-li-r"><div class="mv2-li-amt gain">${fmt(amt)}</div></div>
+        </div>`).join('')}
+      </div>
+    ` : ''}
+    <button class="mv2-save-btn" style="background:#fff;color:#4f46e5;border:1px solid #4f46e5;width:100%;" onclick="mv2CloseDetailSheet();setTimeout(()=>mv2GoTab('reports'),200)">View full reports</button>
+  `;
+  if (window.lucide) lucide.createIcons();
 }
 
 function mv2TxnRow(t) {
