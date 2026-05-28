@@ -1605,6 +1605,78 @@ body.mv2.mv2-page-mode #mv2BackBtn { display: flex !important; }
 [data-theme="dark"] .mv2-adv-btn { border-color: #2c2c2e; color: #818cf8; }
 .mv2-adv-btn [data-lucide] { width: 14px; height: 14px; }
 
+/* POLISH — tap feedback, slide transitions, skeleton loaders, pull-to-refresh */
+body.mv2 button { -webkit-tap-highlight-color: transparent; }
+.mv2-qa, .mv2-bn-tab, .mv2-bn-fab, .mv2-mcard, .mv2-pill, .mv2-pill-btn,
+.mv2-chip, .mv2-save-btn, .mv2-adv-btn, .mv2-iconbtn, .mv2-cat-tile,
+.mv2-more-item, .mv2-more-btn, .mv2-li, .mv2-sheet-close, .mv2-profile-chip {
+  transition: transform 0.1s ease, background-color 0.15s ease, opacity 0.15s ease;
+}
+.mv2-qa:active, .mv2-bn-fab:active, .mv2-mcard:active, .mv2-pill:active,
+.mv2-pill-btn:active, .mv2-chip:active, .mv2-iconbtn:active, .mv2-cat-tile:active,
+.mv2-more-item:active, .mv2-more-btn:active, .mv2-li:active,
+.mv2-sheet-close:active, .mv2-profile-chip:active {
+  transform: scale(0.96);
+}
+.mv2-save-btn:active, .mv2-adv-btn:active { transform: scale(0.98); opacity: 0.9; }
+.mv2-bn-tab:active { opacity: 0.65; }
+
+/* Tab page slide transitions */
+@keyframes mv2SlideInR { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes mv2SlideInL { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
+.mv2-body.slide-right { animation: mv2SlideInR 0.24s cubic-bezier(0.32, 0.72, 0, 1); }
+.mv2-body.slide-left { animation: mv2SlideInL 0.24s cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* Skeleton shimmer */
+@keyframes mv2Shimmer { 0% { background-position: -200px 0; } 100% { background-position: 200px 0; } }
+.mv2-skel {
+  background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
+  background-size: 200px 100%;
+  animation: mv2Shimmer 1.2s linear infinite;
+  border-radius: 8px;
+}
+[data-theme="dark"] .mv2-skel {
+  background: linear-gradient(90deg, #1c1c1e 0%, #2c2c2e 50%, #1c1c1e 100%);
+  background-size: 200px 100%;
+}
+.mv2-skel-hero { height: 110px; margin-bottom: 14px; border-radius: 18px; }
+.mv2-skel-row { height: 64px; margin-bottom: 10px; border-radius: 14px; }
+.mv2-skel-stat { height: 60px; border-radius: 14px; }
+.mv2-skel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+
+/* Top progress bar during cloud sync */
+.mv2-sync-bar {
+  position: absolute; top: 0; left: 0;
+  height: 2px; width: 0;
+  background: linear-gradient(90deg, transparent, #4f46e5, transparent);
+  z-index: 10;
+  transition: opacity 0.2s ease;
+  opacity: 0;
+}
+.mv2-sync-bar.active {
+  width: 100%;
+  opacity: 1;
+  animation: mv2SyncBar 1.4s linear infinite;
+}
+@keyframes mv2SyncBar { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
+
+/* Pull-to-refresh indicator (mv2 body) */
+.mv2-ptr {
+  position: absolute; top: -50px; left: 50%;
+  transform: translateX(-50%);
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: #fff; color: #4f46e5;
+  border: 1px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5;
+  transition: top 0.2s ease, transform 0.2s ease;
+}
+[data-theme="dark"] .mv2-ptr { background: #1c1c1e; color: #818cf8; border-color: #2c2c2e; }
+.mv2-ptr [data-lucide] { width: 18px; height: 18px; }
+.mv2-ptr.refreshing [data-lucide] { animation: mv2Spin 0.8s linear infinite; }
+@keyframes mv2Spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 /* BACK BUTTON (when viewing non-tab pages) */
 #mv2BackBtn {
   position: fixed;
@@ -9952,6 +10024,7 @@ function mv2Render() {
   mv2RenderBNav();
   mv2RenderBody();
   if (window.lucide) lucide.createIcons();
+  mv2UpdateThemeColor();
 }
 
 function mv2RenderHeader() {
@@ -10004,10 +10077,30 @@ function mv2RenderBNav() {
   }).join('');
 }
 
+const MV2_TAB_ORDER = { home: 0, money: 1, reports: 2, more: 3 };
 function mv2GoTab(tab) {
+  const prevIdx = MV2_TAB_ORDER[mv2State.tab] ?? 0;
+  const nextIdx = MV2_TAB_ORDER[tab] ?? 0;
+  const dir = nextIdx >= prevIdx ? 'slide-right' : 'slide-left';
   mv2State.tab = tab; mv2State.lastTab = tab;
   mv2Render();
-  const b = document.getElementById('mv2Body'); if (b) b.scrollTop = 0;
+  const b = document.getElementById('mv2Body');
+  if (b) {
+    b.scrollTop = 0;
+    b.classList.remove('slide-right', 'slide-left');
+    void b.offsetWidth; // force reflow so re-add triggers animation
+    b.classList.add(dir);
+  }
+  mv2UpdateThemeColor();
+}
+
+function mv2UpdateThemeColor() {
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  let color = isDark ? '#000000' : '#f7f5ef';
+  // Home tab has a dark hero card at top — match that color when in light mode for cohesion
+  if (!isDark && mv2State.tab === 'home') color = '#f7f5ef';
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', color);
 }
 
 /* ====== ADD TRANSACTION BOTTOM SHEET ====== */
@@ -10642,6 +10735,113 @@ function mv2RestoreShell() {
   document.body.classList.remove('mv2-page-mode');
   mv2Render();
 }
+
+/* ====== SYNC INDICATOR (top progress bar) ====== */
+function mv2EnsureSyncBar() {
+  if (document.getElementById('mv2SyncBar')) return;
+  const shell = document.getElementById('mv2Shell'); if (!shell) return;
+  const bar = document.createElement('div');
+  bar.id = 'mv2SyncBar';
+  bar.className = 'mv2-sync-bar';
+  shell.appendChild(bar);
+}
+function mv2SetSyncing(on) {
+  mv2EnsureSyncBar();
+  const bar = document.getElementById('mv2SyncBar');
+  if (bar) bar.classList.toggle('active', !!on);
+}
+// Hook into cloud status polling
+setInterval(() => {
+  if (!mv2IsMobile() || !document.body.classList.contains('mv2')) return;
+  if (typeof cloud === 'undefined') return;
+  mv2SetSyncing(cloud.status === 'syncing');
+}, 600);
+
+/* ====== PULL TO REFRESH (mv2-body) ====== */
+let mv2Ptr = { startY: 0, dy: 0, pulling: false, refreshing: false };
+function mv2AttachPtr() {
+  const body = document.getElementById('mv2Body'); if (!body) return;
+  if (body.dataset.ptrInit) return;
+  body.dataset.ptrInit = '1';
+  // Indicator
+  const ind = document.createElement('div');
+  ind.id = 'mv2PtrInd';
+  ind.className = 'mv2-ptr';
+  ind.innerHTML = '<i data-lucide="refresh-cw"></i>';
+  body.style.position = 'relative';
+  body.appendChild(ind);
+  body.addEventListener('touchstart', (e) => {
+    if (body.scrollTop > 4 || mv2Ptr.refreshing) return;
+    mv2Ptr.startY = e.touches[0].clientY;
+    mv2Ptr.pulling = true;
+  }, { passive: true });
+  body.addEventListener('touchmove', (e) => {
+    if (!mv2Ptr.pulling) return;
+    const dy = e.touches[0].clientY - mv2Ptr.startY;
+    if (dy > 0 && body.scrollTop <= 4) {
+      const dist = Math.min(dy * 0.45, 70);
+      ind.style.top = `${-50 + dist}px`;
+      mv2Ptr.dy = dy;
+    }
+  }, { passive: true });
+  body.addEventListener('touchend', async () => {
+    if (!mv2Ptr.pulling) return;
+    mv2Ptr.pulling = false;
+    if (mv2Ptr.dy > 70) {
+      // Trigger refresh
+      mv2Ptr.refreshing = true;
+      ind.classList.add('refreshing');
+      ind.style.top = '12px';
+      try {
+        if (typeof pullAllFromCloud === 'function' && cloud?.activeProfileId) {
+          await pullAllFromCloud({ silent: true });
+        }
+        if (typeof generateRecurringDrafts === 'function') await generateRecurringDrafts();
+        mv2Render();
+      } catch (e) { console.warn('mv2 ptr refresh failed', e); }
+      setTimeout(() => {
+        ind.classList.remove('refreshing');
+        ind.style.top = '-50px';
+        mv2Ptr.refreshing = false;
+      }, 350);
+    } else {
+      ind.style.top = '-50px';
+    }
+    mv2Ptr.dy = 0;
+    if (window.lucide) lucide.createIcons();
+  });
+}
+
+/* ====== SKELETON LOADERS (during initial sync) ====== */
+function mv2RenderSkeleton(body) {
+  body.innerHTML = `
+    <div class="mv2-skel mv2-skel-hero"></div>
+    <div class="mv2-skel-grid">
+      <div class="mv2-skel mv2-skel-stat"></div>
+      <div class="mv2-skel mv2-skel-stat"></div>
+    </div>
+    <div class="mv2-skel" style="width:120px;height:14px;margin:14px 0 10px;"></div>
+    <div class="mv2-skel mv2-skel-row"></div>
+    <div class="mv2-skel mv2-skel-row"></div>
+    <div class="mv2-skel mv2-skel-row"></div>
+  `;
+}
+
+/* ====== Wrap mv2RenderBody to show skeleton when state is empty + syncing ====== */
+const __mv2OrigRenderBody = mv2RenderBody;
+mv2RenderBody = function() {
+  const body = document.getElementById('mv2Body'); if (!body) return;
+  const isEmpty = (!state.accounts || state.accounts.length === 0) && (!state.transactions || state.transactions.length === 0);
+  const isSyncing = (typeof cloud !== 'undefined') && cloud.status === 'syncing';
+  if (isEmpty && isSyncing && mv2State.tab !== 'more') {
+    mv2RenderSkeleton(body);
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+  __mv2OrigRenderBody();
+  // Attach pull-to-refresh after first body render
+  setTimeout(mv2AttachPtr, 0);
+};
 
 /* ====== Resize + Boot ====== */
 window.addEventListener('resize', () => {
