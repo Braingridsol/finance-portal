@@ -1,7 +1,7 @@
 // Finance Portal — Service Worker
 // Cache-first for app shell & libs; network-first for Supabase API.
 
-const CACHE_VERSION = 'fp-v1.3.0';
+const CACHE_VERSION = 'fp-v1.4.0';
 const APP_SHELL = [
   './finance-tracker.html',
   './manifest.webmanifest',
