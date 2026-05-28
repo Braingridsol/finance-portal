@@ -1744,6 +1744,376 @@ body.mv2 button { -webkit-tap-highlight-color: transparent; }
 .mv2-ptr.refreshing [data-lucide] { animation: mv2Spin 0.8s linear infinite; }
 @keyframes mv2Spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+/* Add buttons + empty states + quick-action tiles for Money sub-tabs */
+.mv2-add-tile {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1.5px dashed;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  width: 100%;
+}
+.mv2-add-tile [data-lucide] { width: 16px; height: 16px; }
+.mv2-add-tile.t-acct { background: #dbeafe; color: #2563eb; border-color: #93c5fd; }
+.mv2-add-tile.t-card { background: #fce7f3; color: #db2777; border-color: #f9a8d4; }
+.mv2-add-tile.t-loan { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+.mv2-add-tile.t-invest { background: #d1fae5; color: #059669; border-color: #86efac; }
+.mv2-add-tile.t-insure { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+[data-theme="dark"] .mv2-add-tile.t-acct { background: #1e3a8a; color: #93c5fd; border-color: #2563eb; }
+[data-theme="dark"] .mv2-add-tile.t-card { background: #831843; color: #f9a8d4; border-color: #db2777; }
+[data-theme="dark"] .mv2-add-tile.t-loan { background: #7f1d1d; color: #fca5a5; border-color: #dc2626; }
+[data-theme="dark"] .mv2-add-tile.t-invest { background: #064e3b; color: #6ee7b7; border-color: #059669; }
+[data-theme="dark"] .mv2-add-tile.t-insure { background: #78350f; color: #fcd34d; border-color: #d97706; }
+
+.mv2-empty {
+  border-radius: 16px;
+  padding: 22px 16px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.mv2-empty-ic {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.mv2-empty-ic [data-lucide] { width: 26px; height: 26px; }
+.mv2-empty-t { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.mv2-empty-m { font-size: 11px; line-height: 1.5; opacity: 0.85; }
+.mv2-empty.t-acct { background: #dbeafe; color: #1e40af; }
+.mv2-empty.t-card { background: #fce7f3; color: #831843; }
+.mv2-empty.t-loan { background: #fee2e2; color: #991b1b; }
+.mv2-empty.t-invest { background: #d1fae5; color: #065f46; }
+.mv2-empty.t-insure { background: #fef3c7; color: #92400e; }
+.mv2-empty.t-acct .mv2-empty-ic { background: rgba(255,255,255,0.7); color: #2563eb; }
+.mv2-empty.t-card .mv2-empty-ic { background: rgba(255,255,255,0.7); color: #db2777; }
+.mv2-empty.t-loan .mv2-empty-ic { background: rgba(255,255,255,0.7); color: #dc2626; }
+.mv2-empty.t-invest .mv2-empty-ic { background: rgba(255,255,255,0.7); color: #059669; }
+.mv2-empty.t-insure .mv2-empty-ic { background: rgba(255,255,255,0.7); color: #d97706; }
+[data-theme="dark"] .mv2-empty.t-acct { background: #1e3a8a; color: #93c5fd; }
+[data-theme="dark"] .mv2-empty.t-card { background: #831843; color: #f9a8d4; }
+[data-theme="dark"] .mv2-empty.t-loan { background: #7f1d1d; color: #fca5a5; }
+[data-theme="dark"] .mv2-empty.t-invest { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .mv2-empty.t-insure { background: #78350f; color: #fcd34d; }
+[data-theme="dark"] .mv2-empty .mv2-empty-ic { background: rgba(255,255,255,0.1); }
+
+.mv2-solid-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.mv2-solid-btn [data-lucide] { width: 16px; height: 16px; }
+.mv2-solid-btn.t-acct { background: #2563eb; }
+.mv2-solid-btn.t-card { background: #db2777; }
+.mv2-solid-btn.t-loan { background: #dc2626; }
+.mv2-solid-btn.t-invest { background: #059669; }
+.mv2-solid-btn.t-insure { background: #d97706; }
+
+/* Quick action tiles inside detail sheets */
+.mv2-qa-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.mv2-qa-tile {
+  background: #f7f5ef;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 11px 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+  text-align: center;
+}
+[data-theme="dark"] .mv2-qa-tile { background: #0a0a0a; border-color: #2c2c2e; color: #fff; }
+.mv2-qa-tile [data-lucide] { width: 18px; height: 18px; }
+.mv2-qa-tile.primary {
+  color: #fff;
+  border-color: transparent;
+}
+.mv2-qa-tile.primary.t-acct { background: #2563eb; }
+.mv2-qa-tile.primary.t-card { background: #7c3aed; }
+.mv2-qa-tile.primary.t-loan { background: #dc2626; }
+.mv2-qa-tile.primary.t-invest { background: #059669; }
+.mv2-qa-tile.primary.t-insure { background: #d97706; }
+
+/* ========================================================================
+   MOBILE V2 MODAL — Make the existing modal look professional & spacious
+======================================================================== */
+body.mv2 .modal-backdrop { z-index: 240 !important; align-items: flex-end; padding: 0; }
+body.mv2 .modal {
+  max-width: 100% !important;
+  max-height: 95vh !important;
+  height: 95vh;
+  width: 100%;
+  border-radius: 24px 24px 0 0 !important;
+  padding: 0 !important;
+  display: flex; flex-direction: column;
+  background: #fff;
+}
+[data-theme="dark"] body.mv2 .modal { background: #1c1c1e; }
+
+/* Drag handle (visual cue at top) */
+body.mv2 .modal::before {
+  content: '';
+  display: block;
+  width: 38px; height: 4px;
+  background: #d1d5db;
+  border-radius: 2px;
+  margin: 10px auto 6px;
+  flex-shrink: 0;
+}
+[data-theme="dark"] body.mv2 .modal::before { background: #3f3f46; }
+
+/* Header */
+body.mv2 .modal-head {
+  padding: 8px 18px 14px !important;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+[data-theme="dark"] body.mv2 .modal-head { border-bottom-color: #2c2c2e; }
+body.mv2 .modal-title { font-size: 16px !important; font-weight: 700; }
+body.mv2 .modal-head .btn.btn-ghost {
+  background: #f3f4f6; border: none; padding: 0;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+[data-theme="dark"] body.mv2 .modal-head .btn.btn-ghost { background: #2c2c2e; color: #fff; }
+body.mv2 .modal-head .btn.btn-ghost [data-lucide] { width: 16px; height: 16px; }
+
+/* Body (scrollable) */
+body.mv2 .modal-body {
+  flex: 1; overflow-y: auto;
+  padding: 18px 18px 24px !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Form rows */
+body.mv2 .modal-body .form-row {
+  margin-bottom: 16px;
+  gap: 10px;
+}
+body.mv2 .modal-body .form-row-2 { grid-template-columns: 1fr 1fr; }
+body.mv2 .modal-body label {
+  display: block;
+  font-size: 11px; font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+[data-theme="dark"] body.mv2 .modal-body label { color: #9ca3af; }
+
+/* Inputs / selects */
+body.mv2 .modal-body input[type="text"],
+body.mv2 .modal-body input[type="number"],
+body.mv2 .modal-body input[type="date"],
+body.mv2 .modal-body input[type="email"],
+body.mv2 .modal-body input[type="password"],
+body.mv2 .modal-body select,
+body.mv2 .modal-body textarea {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  background: #fff;
+  color: #111;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: inherit;
+}
+[data-theme="dark"] body.mv2 .modal-body input,
+[data-theme="dark"] body.mv2 .modal-body select,
+[data-theme="dark"] body.mv2 .modal-body textarea {
+  background: #0a0a0a; border-color: #2c2c2e; color: #fff;
+}
+body.mv2 .modal-body textarea { height: 80px; padding: 12px 14px; }
+body.mv2 .modal-body select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%236b7280' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+body.mv2 .modal-body input:focus,
+body.mv2 .modal-body select:focus,
+body.mv2 .modal-body textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+}
+
+/* Amount input — make it big and prominent */
+body.mv2 .modal-body input#txAmount {
+  height: 56px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Type pills — color-coded, big tap targets */
+body.mv2 .modal-body .pill-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+body.mv2 .modal-body .pill {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 8px !important;
+  background: #f3f4f6 !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #4b5563 !important;
+  cursor: pointer;
+  min-height: 44px;
+}
+[data-theme="dark"] body.mv2 .modal-body .pill { background: #2c2c2e !important; color: #d1d5db !important; }
+body.mv2 .modal-body .pill [data-lucide] { width: 16px !important; height: 16px !important; margin: 0 !important; }
+body.mv2 .modal-body .pill.active { background: #4f46e5 !important; color: #fff !important; }
+/* Subtle color per active type */
+body.mv2 .modal-body .pill.active:nth-child(1) { background: #10b981 !important; }
+body.mv2 .modal-body .pill.active:nth-child(2) { background: #ef4444 !important; }
+body.mv2 .modal-body .pill.active:nth-child(3) { background: #8b5cf6 !important; }
+body.mv2 .modal-body .pill.active:nth-child(4) { background: #3b82f6 !important; }
+
+/* Save-as radio block — cleaner box */
+body.mv2 .modal-body .form-row[style*="background"] {
+  background: #f7f5ef !important;
+  border-radius: 14px !important;
+  padding: 14px !important;
+}
+[data-theme="dark"] body.mv2 .modal-body .form-row[style*="background"] { background: #0a0a0a !important; }
+body.mv2 .modal-body input[type="radio"] { width: auto; height: auto; margin-right: 6px; }
+
+/* Footer — sticky with elevated save button */
+body.mv2 .modal-foot {
+  padding: 12px 18px calc(16px + env(safe-area-inset-bottom)) !important;
+  border-top: 1px solid #f3f4f6;
+  background: #fff;
+  display: flex; gap: 8px; flex-wrap: wrap;
+  flex-shrink: 0;
+}
+[data-theme="dark"] body.mv2 .modal-foot { background: #1c1c1e; border-top-color: #2c2c2e; }
+body.mv2 .modal-foot .btn {
+  height: 46px;
+  padding: 0 18px !important;
+  border-radius: 12px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+body.mv2 .modal-foot .btn.btn-primary { flex: 2; }
+body.mv2 .modal-foot .btn.btn-secondary {
+  background: #f3f4f6; color: #111; border: none;
+  flex: 0 0 auto; min-width: 90px;
+}
+[data-theme="dark"] body.mv2 .modal-foot .btn.btn-secondary { background: #2c2c2e; color: #fff; }
+body.mv2 .modal-foot .btn.btn-danger { flex: 0 0 auto; }
+body.mv2 .modal-foot .btn [data-lucide] { width: 16px; height: 16px; }
+
+/* FULL-PAGE ADD TRANSACTION (slides in from right) — DEPRECATED, kept for compatibility */
+.mv2-fullpage {
+  position: fixed; inset: 0;
+  background: #f7f5ef;
+  z-index: 220;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex; flex-direction: column;
+  visibility: hidden;
+  color: #111;
+}
+.mv2-fullpage.open { transform: translateX(0); visibility: visible; }
+[data-theme="dark"] .mv2-fullpage { background: #000; color: #fff; }
+.mv2-fp-header {
+  padding: calc(10px + env(safe-area-inset-top)) 14px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.mv2-fp-back {
+  width: 40px; height: 40px;
+  border-radius: 50%; background: transparent;
+  border: none; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: inherit;
+}
+.mv2-fp-back [data-lucide] { width: 22px; height: 22px; }
+.mv2-fp-title { font-size: 17px; font-weight: 700; flex: 1; }
+.mv2-fp-action {
+  background: transparent; border: none;
+  font-size: 12px; font-weight: 600;
+  color: #4f46e5; padding: 8px 4px;
+  cursor: pointer;
+}
+[data-theme="dark"] .mv2-fp-action { color: #818cf8; }
+.mv2-fp-body {
+  flex: 1; overflow-y: auto;
+  padding: 4px 18px 24px;
+  -webkit-overflow-scrolling: touch;
+}
+.mv2-fp-footer {
+  padding: 12px 18px calc(16px + env(safe-area-inset-bottom));
+  background: #f7f5ef;
+  border-top: 1px solid #e5e7eb;
+  display: flex; gap: 8px;
+}
+[data-theme="dark"] .mv2-fp-footer { background: #000; border-top-color: #2c2c2e; }
+
+/* MV2 TOAST OVERRIDES — move to top, lift above sheets, make prominent */
+body.mv2 .toast-host {
+  top: calc(16px + env(safe-area-inset-top)) !important;
+  bottom: auto !important;
+  left: 16px !important;
+  right: 16px !important;
+  z-index: 250 !important;
+  align-items: stretch;
+}
+body.mv2 .toast {
+  min-width: 0 !important;
+  border-left-width: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 14px 16px;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  animation: mv2ToastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes mv2ToastIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+body.mv2 .toast.success { background: #d1fae5; border-left-color: #10b981; color: #065f46; }
+body.mv2 .toast.success [data-lucide] { color: #10b981; }
+body.mv2 .toast.error { background: #fee2e2; border-left-color: #ef4444; color: #991b1b; }
+body.mv2 .toast.error [data-lucide] { color: #ef4444; }
+body.mv2 .toast.warning { background: #fef3c7; border-left-color: #d97706; color: #92400e; }
+body.mv2 .toast.warning [data-lucide] { color: #d97706; }
+body.mv2 .toast.info { background: #dbeafe; border-left-color: #2563eb; color: #1e40af; }
+body.mv2 .toast.info [data-lucide] { color: #2563eb; }
+[data-theme="dark"] body.mv2 .toast.success { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] body.mv2 .toast.error { background: #7f1d1d; color: #fca5a5; }
+[data-theme="dark"] body.mv2 .toast.warning { background: #78350f; color: #fcd34d; }
+[data-theme="dark"] body.mv2 .toast.info { background: #1e3a8a; color: #93c5fd; }
+
 /* BACK BUTTON (when viewing non-tab pages) */
 #mv2BackBtn {
   position: fixed;
@@ -2886,8 +3256,13 @@ function txnRowHTML(t, opts = {}) {
   </div>`;
 }
 
-function openTxnModal(id) {
-  const t = id ? state.transactions.find(x => x.id === id) : { type: 'expense', date: today(), status: 'Draft' };
+function openTxnModal(id, prefill) {
+  let t;
+  if (id) {
+    t = state.transactions.find(x => x.id === id);
+  } else {
+    t = { type: 'expense', date: today(), status: 'Draft', ...(prefill || {}) };
+  }
   buildTxnForm(t, id);
 }
 
@@ -10165,60 +10540,30 @@ function mv2UpdateThemeColor() {
   if (meta) meta.setAttribute('content', color);
 }
 
-/* ====== ADD TRANSACTION BOTTOM SHEET ====== */
+/* ====== ADD TRANSACTION: just opens the existing modal (mobile-styled) ====== */
 let mv2Sheet = { type: 'expense', categoryId: null, accountId: null, toAccountId: null, date: null };
 
 function mv2OpenAddSheet() {
-  // Build sheet DOM if not exists
-  if (!document.getElementById('mv2AddSheet')) mv2BuildAddSheet();
-  // Default state
-  mv2Sheet.type = 'expense';
-  mv2Sheet.categoryId = null;
-  mv2Sheet.accountId = (state.accounts || []).find(a => a.status === 'Active')?.id || null;
-  mv2Sheet.toAccountId = null;
-  mv2Sheet.date = today();
-  mv2RenderSheetBody();
-  // Show with animation
-  requestAnimationFrame(() => {
-    document.getElementById('mv2SheetBackdrop').classList.add('open');
-    document.getElementById('mv2AddSheet').classList.add('open');
-    setTimeout(() => document.getElementById('mvtxAmount')?.focus(), 280);
-  });
+  if (typeof openTxnModal === 'function') openTxnModal();
 }
-
 function mv2CloseAddSheet() {
-  document.getElementById('mv2SheetBackdrop')?.classList.remove('open');
-  document.getElementById('mv2AddSheet')?.classList.remove('open');
-}
-
-function mv2BuildAddSheet() {
-  const backdrop = document.createElement('div');
-  backdrop.id = 'mv2SheetBackdrop';
-  backdrop.className = 'mv2-sheet-backdrop';
-  backdrop.onclick = mv2CloseAddSheet;
-  document.body.appendChild(backdrop);
-
-  const sheet = document.createElement('div');
-  sheet.id = 'mv2AddSheet';
-  sheet.className = 'mv2-sheet';
-  document.body.appendChild(sheet);
+  if (typeof closeModal === 'function') closeModal();
 }
 
 function mv2RenderSheetBody() {
-  const sheet = document.getElementById('mv2AddSheet'); if (!sheet) return;
+  const page = document.getElementById('mv2AddPage'); if (!page) return;
   const t = mv2Sheet.type;
   const isInc = t === 'income';
   const isTr = t === 'transfer';
-  const isSet = t === 'settlement';
 
-  // Smart category ordering: use frequency from recent transactions
+  // Smart category ordering (by name — schema stores name)
   const catKind = isInc ? 'income' : 'expense';
   const usage = {};
   (state.transactions || []).filter(x => x.status !== 'Draft').slice(-60).forEach(x => {
-    if (x.categoryId) usage[x.categoryId] = (usage[x.categoryId] || 0) + 1;
+    if (x.category) usage[x.category] = (usage[x.category] || 0) + 1;
   });
   const cats = (state.categories || []).filter(c => c.kind === catKind);
-  cats.sort((a, b) => (usage[b.id] || 0) - (usage[a.id] || 0));
+  cats.sort((a, b) => (usage[b.name] || 0) - (usage[a.name] || 0));
   const quickCats = cats.slice(0, 5);
 
   // Accounts list (active only)
@@ -10227,89 +10572,94 @@ function mv2RenderSheetBody() {
   const fromAcct = acctById(mv2Sheet.accountId);
   const toAcct = acctById(mv2Sheet.toAccountId);
 
-  sheet.innerHTML = `
-    <div class="mv2-sheet-handle"></div>
-    <div class="mv2-sheet-titlebar">
-      <div class="mv2-sheet-title">New ${isInc ? 'income' : isTr ? 'transfer' : 'expense'}</div>
-      <button class="mv2-sheet-close" onclick="mv2CloseAddSheet()"><i data-lucide="x"></i></button>
-    </div>
+  const title = `New ${isInc ? 'income' : isTr ? 'transfer' : 'expense'}`;
 
-    <div class="mv2-amt-area">
-      <div class="mv2-amt-lbl">Amount</div>
-      <div class="mv2-amt-input-wrap">
-        <span class="mv2-amt-curr">${state.settings?.currency || '₹'}</span>
-        <input class="mv2-amt-input" id="mvtxAmount" type="number" inputmode="decimal" placeholder="0" step="any" />
+  page.innerHTML = `
+    <header class="mv2-fp-header">
+      <button class="mv2-fp-back" onclick="mv2CloseAddSheet()" aria-label="Back"><i data-lucide="arrow-left"></i></button>
+      <div class="mv2-fp-title">${title}</div>
+      <button class="mv2-fp-action" onclick="mv2CloseAddSheet(); setTimeout(() => typeof openTxnModal === 'function' && openTxnModal(), 250);">Advanced</button>
+    </header>
+
+    <div class="mv2-fp-body">
+      <div class="mv2-amt-area" style="margin-top:8px;">
+        <div class="mv2-amt-lbl">Amount</div>
+        <div class="mv2-amt-input-wrap">
+          <span class="mv2-amt-curr">${state.settings?.currency || '₹'}</span>
+          <input class="mv2-amt-input" id="mvtxAmount" type="number" inputmode="decimal" placeholder="0" step="any" />
+        </div>
       </div>
-    </div>
 
-    <div class="mv2-chip-row">
-      <button class="mv2-chip ${t==='expense'?'active':''}" data-type="expense" onclick="mv2SetSheetType('expense')">Expense</button>
-      <button class="mv2-chip ${t==='income'?'active':''}" data-type="income" onclick="mv2SetSheetType('income')">Income</button>
-      <button class="mv2-chip ${t==='transfer'?'active':''}" data-type="transfer" onclick="mv2SetSheetType('transfer')">Transfer</button>
-    </div>
+      <div class="mv2-chip-row">
+        <button class="mv2-chip ${t==='expense'?'active':''}" data-type="expense" onclick="mv2SetSheetType('expense')">Expense</button>
+        <button class="mv2-chip ${t==='income'?'active':''}" data-type="income" onclick="mv2SetSheetType('income')">Income</button>
+        <button class="mv2-chip ${t==='transfer'?'active':''}" data-type="transfer" onclick="mv2SetSheetType('transfer')">Transfer</button>
+      </div>
 
-    ${!isTr ? `
-      <div class="mv2-sect-lbl">Category</div>
-      <div class="mv2-cat-grid">
-        ${quickCats.map(c => `
-          <button class="mv2-cat-tile ${mv2Sheet.categoryId === c.id ? 'active' : ''} ${isInc ? 'income' : ''}" onclick="mv2PickCat('${c.id}')">
-            <div class="mv2-cat-ic"><i data-lucide="${c.icon || 'circle'}"></i></div>
-            <div class="mv2-cat-lbl">${escapeHTML(c.name)}</div>
+      ${!isTr ? `
+        <div class="mv2-sect-lbl">Category</div>
+        <div class="mv2-cat-grid">
+          ${quickCats.map(c => `
+            <button class="mv2-cat-tile ${mv2Sheet.categoryId === c.id ? 'active' : ''} ${isInc ? 'income' : ''}" onclick="mv2PickCat('${c.id}')">
+              <div class="mv2-cat-ic"><i data-lucide="${c.icon || 'circle'}"></i></div>
+              <div class="mv2-cat-lbl">${escapeHTML(c.name)}</div>
+            </button>
+          `).join('')}
+          <button class="mv2-cat-tile" onclick="mv2OpenCatPicker()">
+            <div class="mv2-cat-ic"><i data-lucide="more-horizontal"></i></div>
+            <div class="mv2-cat-lbl">More</div>
           </button>
-        `).join('')}
-        <button class="mv2-cat-tile" onclick="mv2OpenCatPicker()">
-          <div class="mv2-cat-ic"><i data-lucide="more-horizontal"></i></div>
-          <div class="mv2-cat-lbl">More</div>
-        </button>
-      </div>
-    ` : ''}
+        </div>
+      ` : ''}
 
-    <div class="mv2-pill-row">
-      ${isTr ? `
-        <div class="mv2-pill-wrap">
-          <button class="mv2-pill-btn"><i data-lucide="arrow-up-right"></i><span class="mv2-pill-lbl">${fromAcct ? escapeHTML(fromAcct.bank || fromAcct.name) : 'From'}</span></button>
-          <select onchange="mv2Sheet.accountId = this.value; mv2RenderSheetBody();">
-            <option value="">From account</option>
-            ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.accountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
-          </select>
-        </div>
-        <div class="mv2-pill-wrap">
-          <button class="mv2-pill-btn"><i data-lucide="arrow-down-left"></i><span class="mv2-pill-lbl">${toAcct ? escapeHTML(toAcct.bank || toAcct.name) : 'To'}</span></button>
-          <select onchange="mv2Sheet.toAccountId = this.value; mv2RenderSheetBody();">
-            <option value="">To account</option>
-            ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.toAccountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
-          </select>
-        </div>
-      ` : `
-        <div class="mv2-pill-wrap">
-          <button class="mv2-pill-btn"><i data-lucide="building-bank"></i><span class="mv2-pill-lbl">${fromAcct ? escapeHTML(fromAcct.bank || fromAcct.name) : 'Account'}</span></button>
-          <select onchange="mv2Sheet.accountId = this.value; mv2RenderSheetBody();">
-            <option value="">Account</option>
-            ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.accountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
-          </select>
-        </div>
-        <div class="mv2-pill-wrap" style="flex:0 0 130px;">
-          <button class="mv2-pill-btn"><i data-lucide="calendar"></i><span class="mv2-pill-lbl">${mv2DateLabel(mv2Sheet.date)}</span></button>
-          <input type="date" value="${mv2Sheet.date}" onchange="mv2Sheet.date = this.value; mv2RenderSheetBody();" />
-        </div>
-      `}
-    </div>
-
-    ${isTr ? `
+      <div class="mv2-sect-lbl">${isTr ? 'Accounts' : 'Account & date'}</div>
       <div class="mv2-pill-row">
-        <div class="mv2-pill-wrap" style="flex:0 0 130px;">
-          <button class="mv2-pill-btn"><i data-lucide="calendar"></i><span class="mv2-pill-lbl">${mv2DateLabel(mv2Sheet.date)}</span></button>
-          <input type="date" value="${mv2Sheet.date}" onchange="mv2Sheet.date = this.value; mv2RenderSheetBody();" />
-        </div>
+        ${isTr ? `
+          <div class="mv2-pill-wrap">
+            <button class="mv2-pill-btn"><i data-lucide="arrow-up-right"></i><span class="mv2-pill-lbl">${fromAcct ? escapeHTML(fromAcct.bank || fromAcct.name) : 'From'}</span></button>
+            <select onchange="mv2Sheet.accountId = this.value; mv2RenderSheetBody();">
+              <option value="">From account</option>
+              ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.accountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
+            </select>
+          </div>
+          <div class="mv2-pill-wrap">
+            <button class="mv2-pill-btn"><i data-lucide="arrow-down-left"></i><span class="mv2-pill-lbl">${toAcct ? escapeHTML(toAcct.bank || toAcct.name) : 'To'}</span></button>
+            <select onchange="mv2Sheet.toAccountId = this.value; mv2RenderSheetBody();">
+              <option value="">To account</option>
+              ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.toAccountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
+            </select>
+          </div>
+        ` : `
+          <div class="mv2-pill-wrap">
+            <button class="mv2-pill-btn"><i data-lucide="building-bank"></i><span class="mv2-pill-lbl">${fromAcct ? escapeHTML(fromAcct.bank || fromAcct.name) : 'Account'}</span></button>
+            <select onchange="mv2Sheet.accountId = this.value; mv2RenderSheetBody();">
+              <option value="">Account</option>
+              ${accts.map(a => `<option value="${a.id}" ${mv2Sheet.accountId===a.id?'selected':''}>${escapeHTML(a.bank || a.name)}${a.last4?' ··'+a.last4:''}</option>`).join('')}
+            </select>
+          </div>
+          <div class="mv2-pill-wrap" style="flex:0 0 130px;">
+            <button class="mv2-pill-btn"><i data-lucide="calendar"></i><span class="mv2-pill-lbl">${mv2DateLabel(mv2Sheet.date)}</span></button>
+            <input type="date" value="${mv2Sheet.date}" onchange="mv2Sheet.date = this.value; mv2RenderSheetBody();" />
+          </div>
+        `}
       </div>
-    ` : ''}
 
-    <input class="mv2-note-input" id="mvtxNote" placeholder="${isTr ? 'Note (optional)' : 'Payee or note (optional)'}" />
+      ${isTr ? `
+        <div class="mv2-pill-row">
+          <div class="mv2-pill-wrap" style="flex:0 0 130px;">
+            <button class="mv2-pill-btn"><i data-lucide="calendar"></i><span class="mv2-pill-lbl">${mv2DateLabel(mv2Sheet.date)}</span></button>
+            <input type="date" value="${mv2Sheet.date}" onchange="mv2Sheet.date = this.value; mv2RenderSheetBody();" />
+          </div>
+        </div>
+      ` : ''}
 
-    <div class="mv2-save-row">
-      <button class="mv2-save-btn" onclick="mv2SaveSheet()">Save</button>
-      <button class="mv2-adv-btn" onclick="mv2CloseAddSheet(); setTimeout(() => typeof openTxnModal === 'function' && openTxnModal(), 200);" title="Advanced (card/split/etc)"><i data-lucide="sliders"></i></button>
+      <div class="mv2-sect-lbl">${isTr ? 'Note' : 'Payee or note'}</div>
+      <input class="mv2-note-input" id="mvtxNote" placeholder="${isTr ? 'Optional note' : 'Optional'}" />
     </div>
+
+    <footer class="mv2-fp-footer">
+      <button class="mv2-save-btn" style="flex:1;" onclick="mv2SaveSheet()">Save transaction</button>
+    </footer>
   `;
   if (window.lucide) lucide.createIcons();
 }
@@ -10365,8 +10715,13 @@ async function mv2SaveSheet() {
   if (isTr && !mv2Sheet.toAccountId) { toast('Choose destination account', 'error'); return; }
   if (isTr && mv2Sheet.accountId === mv2Sheet.toAccountId) { toast('From and to must differ', 'error'); return; }
 
-  const typeMap = { expense: 'Expense', income: 'Income', transfer: 'Internal Transfer' };
+  // Schema CHECK constraint requires lowercase: 'income','expense','settlement','transfer'
+  const typeMap = { expense: 'expense', income: 'income', transfer: 'transfer' };
   const note = (document.getElementById('mvtxNote')?.value || '').trim();
+  // Resolve category NAME (schema stores name, not id)
+  const categoryName = isTr
+    ? 'Transfer'
+    : ((state.categories || []).find(c => c.id === mv2Sheet.categoryId)?.name || '');
   const obj = {
     id: uid(),
     type: typeMap[t],
@@ -10374,8 +10729,7 @@ async function mv2SaveSheet() {
     source: 'Manual',
     date: mv2Sheet.date || today(),
     amount,
-    categoryId: isTr ? null : mv2Sheet.categoryId,
-    category: isTr ? 'Transfer' : ((state.categories || []).find(c => c.id === mv2Sheet.categoryId)?.name || ''),
+    category: categoryName,
     subcategory: '',
     fromAccountId: isInc ? null : mv2Sheet.accountId,
     toAccountId: isInc ? mv2Sheet.accountId : (isTr ? mv2Sheet.toAccountId : null),
@@ -10398,11 +10752,16 @@ async function mv2SaveSheet() {
     await dbPut('transactions', obj);
     if (typeof audit === 'function') await audit('create', 'transaction', obj.id, null, obj);
     mv2CloseAddSheet();
-    toast('Saved', 'success');
+    // Haptic feedback (Android — silently no-ops on iOS)
+    try { navigator.vibrate?.(40); } catch(e){}
+    // Rich, descriptive success toast
+    const typeLabel = isInc ? 'Income added' : isTr ? 'Transfer recorded' : 'Expense added';
+    toast(`${typeLabel} · ${fmt(amount)}`, 'success');
     if (typeof renderCurrent === 'function') renderCurrent();
     mv2Render();
   } catch (err) {
     console.error('mv2SaveSheet failed:', err);
+    try { navigator.vibrate?.([60, 30, 60]); } catch(e){}
     toast('Save failed: ' + err.message, 'error');
   }
 }
@@ -10444,11 +10803,11 @@ function mv2Home(body) {
   const now = new Date();
   const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
   const mTxns = (state.transactions || []).filter(t => t.status !== 'Draft' && t.date >= ms);
-  const income = mTxns.filter(t => t.type === 'Income').reduce((s,t) => s + +t.amount, 0);
-  const expense = mTxns.filter(t => t.type === 'Expense').reduce((s,t) => s + +t.amount, 0);
+  const income = mTxns.filter(t => t.type === 'income').reduce((s,t) => s + +t.amount, 0);
+  const expense = mTxns.filter(t => t.type === 'expense').reduce((s,t) => s + +t.amount, 0);
   // Last month for comparison
   const lmStart = new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString().slice(0,10);
-  const lmExpense = (state.transactions || []).filter(t => t.status !== 'Draft' && t.type === 'Expense' && t.date >= lmStart && t.date < ms).reduce((s,t) => s + +t.amount, 0);
+  const lmExpense = (state.transactions || []).filter(t => t.status !== 'Draft' && t.type === 'expense' && t.date >= lmStart && t.date < ms).reduce((s,t) => s + +t.amount, 0);
   let insight = `Add transactions to start seeing insights.`;
   if (income > 0) {
     const rate = Math.round((income - expense) / income * 100);
@@ -10508,7 +10867,7 @@ function mv2CashflowBanner(income, expense, lmExpense) {
     const now = new Date();
     const lmS = new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString().slice(0,10);
     const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
-    return (state.transactions || []).filter(t => t.status !== 'Draft' && t.type === 'Income' && t.date >= lmS && t.date < ms).reduce((s,t) => s + +t.amount, 0);
+    return (state.transactions || []).filter(t => t.status !== 'Draft' && t.type === 'income' && t.date >= lmS && t.date < ms).reduce((s,t) => s + +t.amount, 0);
   })();
   const lmSaved = lmIncome - (lmExpense || 0);
   // Bar widths: relative split of income vs expense
@@ -10582,14 +10941,14 @@ function mv2RenderCashflowSheet() {
   const monthLabel = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
   const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
   const txns = (state.transactions || []).filter(t => t.status !== 'Draft' && t.date >= ms);
-  const income = txns.filter(t => t.type === 'Income').reduce((s,t) => s + +t.amount, 0);
-  const expense = txns.filter(t => t.type === 'Expense').reduce((s,t) => s + +t.amount, 0);
+  const income = txns.filter(t => t.type === 'income').reduce((s,t) => s + +t.amount, 0);
+  const expense = txns.filter(t => t.type === 'expense').reduce((s,t) => s + +t.amount, 0);
   const saved = income - expense;
   const rate = income > 0 ? Math.round(saved / income * 100) : 0;
 
   // Top spending categories
   const catTotals = {};
-  txns.filter(t => t.type === 'Expense').forEach(t => {
+  txns.filter(t => t.type === 'expense').forEach(t => {
     const key = t.category || 'Other';
     catTotals[key] = (catTotals[key] || 0) + +t.amount;
   });
@@ -10597,7 +10956,7 @@ function mv2RenderCashflowSheet() {
 
   // Top income sources
   const incTotals = {};
-  txns.filter(t => t.type === 'Income').forEach(t => {
+  txns.filter(t => t.type === 'income').forEach(t => {
     const key = t.category || t.payee || 'Other';
     incTotals[key] = (incTotals[key] || 0) + +t.amount;
   });
@@ -10610,8 +10969,8 @@ function mv2RenderCashflowSheet() {
   txns.forEach(t => {
     const d = new Date(t.date).getDate() - 1;
     if (d >= 0 && d < days) {
-      if (t.type === 'Income') dailyInc[d] += +t.amount;
-      if (t.type === 'Expense') dailyExp[d] += +t.amount;
+      if (t.type === 'income') dailyInc[d] += +t.amount;
+      if (t.type === 'expense') dailyExp[d] += +t.amount;
     }
   });
   const maxDay = Math.max(...dailyInc, ...dailyExp, 1);
@@ -10677,11 +11036,12 @@ function mv2RenderCashflowSheet() {
 }
 
 function mv2TxnRow(t) {
-  const isInc = t.type === 'Income';
-  const isTr = t.type === 'Internal Transfer';
-  const isCard = t.type === 'Card Settlement';
-  const cat = (state.categories || []).find(c => c.id === t.categoryId);
-  const catName = cat?.name || (isTr ? 'Transfer' : isCard ? 'Card payment' : 'Other');
+  const isInc = t.type === 'income';
+  const isTr = t.type === 'transfer';
+  const isCard = t.type === 'settlement';
+  // Transactions store category NAME (string); look up by name to get icon
+  const catName = t.category || (isTr ? 'Transfer' : isCard ? 'Card payment' : 'Other');
+  const cat = (state.categories || []).find(c => c.name === catName);
   const icon = isInc ? 'briefcase' : isTr ? 'arrow-left-right' : isCard ? 'credit-card' : (cat?.icon || 'shopping-bag');
   const icCls = isInc ? 'mv2-ic-green' : isTr ? 'mv2-ic-blue' : isCard ? 'mv2-ic-purple' : 'mv2-ic-red';
   const sign = isInc ? '+' : (isTr ? '' : '−');
@@ -10742,37 +11102,44 @@ function mv2GoToMoneySub(sub) {
 function mv2RenderMoneySub() {
   const body = document.getElementById('mv2MoneyBody'); if (!body) return;
   const sub = mv2State.moneySub;
+  // Config per sub-tab
+  const cfg = {
+    accounts: { listFn: () => (state.accounts || []).filter(a => a.status === 'Active'), card: mv2AcctCard, sumLbl: 'Total balance', sumKey: a => +a.balance, countLbl: 'Accounts', tint: 't-acct', emptyIcon: 'building-2', emptyTitle: 'No accounts yet', emptyMsg: 'Add your first bank account to start tracking balances, AMB/AQB and bank fees.', addLbl: 'Add account', openFn: 'mv2QuickAddAccount' },
+    cards: { listFn: () => (state.cards || []).filter(c => c.status !== 'Closed'), card: mv2CardCard, sumLbl: 'Total outstanding', sumKey: c => (typeof getCardOutstanding === 'function' ? getCardOutstanding(c.id) : 0), countLbl: 'Cards', tint: 't-card', emptyIcon: 'credit-card', emptyTitle: 'No credit cards', emptyMsg: 'Add cards to track outstanding, billing cycles, and rewards earned.', addLbl: 'Add credit card', openFn: 'mv2QuickAddCard' },
+    loans: { listFn: () => (state.loans || []).filter(l => l.status === 'Active'), card: mv2LoanCard, sumLbl: 'Total outstanding', sumKey: l => +l.outstanding, countLbl: 'Loans', tint: 't-loan', emptyIcon: 'landmark', emptyTitle: 'No active loans', emptyMsg: 'Track home loans, car loans, personal loans with full amortization and prepayment support.', addLbl: 'Add loan', openFn: 'mv2QuickAddLoan' },
+    investments: { listFn: () => (state.investments || []).filter(i => i.status !== 'Closed'), card: mv2InvCard, sumLbl: 'Portfolio value', sumKey: i => +(i.currentValue || i.invested || 0), countLbl: 'Holdings', tint: 't-invest', emptyIcon: 'trending-up', emptyTitle: 'No investments yet', emptyMsg: 'Track mutual funds, stocks, FDs, gold and more. See gains, asset allocation and goal progress.', addLbl: 'Add investment', openFn: 'mv2QuickAddInvestment' },
+    insurance: { listFn: () => (state.insurance || []).filter(p => p.status === 'Active'), card: mv2InsCard, sumLbl: 'Total cover', sumKey: p => +(p.sumAssured || 0), countLbl: 'Policies', tint: 't-insure', emptyIcon: 'shield-check', emptyTitle: 'No policies yet', emptyMsg: 'Add life, health, vehicle and home insurance. Get renewal reminders and premium alerts.', addLbl: 'Add policy', openFn: 'mv2QuickAddInsurance' }
+  };
+  const c = cfg[sub];
+  if (!c) return;
+  const list = c.listFn();
+  const total = list.reduce((s, x) => s + (c.sumKey(x) || 0), 0);
+
   let html = '';
-  if (sub === 'accounts') {
-    const list = (state.accounts || []).filter(a => a.status === 'Active');
-    const total = list.reduce((s,a) => s + +a.balance, 0);
-    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total balance</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Accounts</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
-    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No accounts yet</div></div>' : list.map(mv2AcctCard).join('');
-    html += `<button class="mv2-mcard" style="background:#4f46e5;color:#fff;border:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;margin-top:10px;" onclick="mv2NavigateToPage('accounts')"><i data-lucide="plus" style="width:16px;height:16px;"></i>Add account</button>`;
-  } else if (sub === 'cards') {
-    const list = (state.cards || []).filter(c => c.status !== 'Closed');
-    const total = list.reduce((s,c) => s + (typeof getCardOutstanding === 'function' ? getCardOutstanding(c.id) : 0), 0);
-    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total outstanding</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Cards</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
-    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No credit cards</div></div>' : list.map(mv2CardCard).join('');
-  } else if (sub === 'loans') {
-    const list = (state.loans || []).filter(l => l.status === 'Active');
-    const total = list.reduce((s,l) => s + +l.outstanding, 0);
-    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total outstanding</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Loans</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
-    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No active loans</div></div>' : list.map(mv2LoanCard).join('');
-  } else if (sub === 'investments') {
-    const list = (state.investments || []).filter(i => i.status !== 'Closed');
-    const total = list.reduce((s,i) => s + +(i.currentValue || i.invested || 0), 0);
-    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Portfolio value</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Holdings</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
-    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No investments yet</div></div>' : list.map(mv2InvCard).join('');
-  } else if (sub === 'insurance') {
-    const list = (state.insurance || []).filter(p => p.status === 'Active');
-    const cover = list.reduce((s,p) => s + +(p.sumAssured || 0), 0);
-    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">Total cover</div><div class="mv2-sum-val">${fmt(cover)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">Policies</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
-    html += list.length === 0 ? '<div class="mv2-listcard"><div class="mv2-li" style="justify-content:center;color:#9ca3af;padding:24px;display:flex;">No policies</div></div>' : list.map(mv2InsCard).join('');
+  if (list.length > 0) {
+    html = `<div class="mv2-sum"><div><div class="mv2-sum-lbl">${c.sumLbl}</div><div class="mv2-sum-val">${fmt(total)}</div></div><div style="text-align:right;"><div class="mv2-sum-lbl">${c.countLbl}</div><div class="mv2-sum-sub">${list.length}</div></div></div>`;
+    html += list.map(c.card).join('');
+    html += `<button class="mv2-add-tile ${c.tint}" onclick="${c.openFn}()"><i data-lucide="plus"></i>${c.addLbl}</button>`;
+    html += '<div style="height:24px;"></div>';
+  } else {
+    // Empty state — big tinted intro card + solid Add button
+    html = `<div class="mv2-empty ${c.tint}">
+      <div class="mv2-empty-ic"><i data-lucide="${c.emptyIcon}"></i></div>
+      <div class="mv2-empty-t">${c.emptyTitle}</div>
+      <div class="mv2-empty-m">${c.emptyMsg}</div>
+    </div>
+    <button class="mv2-solid-btn ${c.tint}" onclick="${c.openFn}()"><i data-lucide="plus"></i>${c.addLbl}</button>`;
   }
   body.innerHTML = html;
   if (window.lucide) lucide.createIcons();
 }
+
+/* Quick-add helpers — open the right modal cleanly */
+function mv2QuickAddAccount() { if (typeof openAccountModal === 'function') openAccountModal(); }
+function mv2QuickAddCard() { if (typeof openCardModal === 'function') openCardModal(); }
+function mv2QuickAddLoan() { if (typeof openLoanModal === 'function') openLoanModal(); }
+function mv2QuickAddInvestment() { if (typeof openInvModal === 'function') openInvModal(); }
+function mv2QuickAddInsurance() { if (typeof openInsModal === 'function') openInsModal(); }
 
 function mv2AcctCard(a) {
   const last4 = a.last4 || (a.accountNumber || '').slice(-4);
@@ -10887,14 +11254,21 @@ function mv2RenderDetailSheet(type, id) {
         `).join('')}
       </div>
     ` : ''}
+    ${cfg.quickActions?.length ? `
+      <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Quick actions</div>
+      <div class="mv2-qa-row">
+        ${cfg.quickActions.map(qa => `
+          <button class="mv2-qa-tile ${qa.primary ? 'primary ' + cfg.tint : ''}" onclick="mv2QAct('${qa.key}','${id}')">
+            <i data-lucide="${qa.icon}"></i>${escapeHTML(qa.label)}
+          </button>
+        `).join('')}
+      </div>
+    ` : ''}
     ${recent.length ? `
       <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Recent activity</div>
       <div class="mv2-listcard" style="margin-bottom:14px;">${recent.map(mv2TxnRow).join('')}</div>
     ` : `<div style="background:#f7f5ef;border-radius:12px;padding:16px;text-align:center;color:#9ca3af;font-size:12px;margin-bottom:14px;">No transactions yet</div>`}
-    <div style="display:flex;gap:8px;">
-      <button class="mv2-save-btn" style="background:#fff;color:#4f46e5;border:1px solid #4f46e5;" onclick="mv2CloseDetailSheet();setTimeout(()=>mv2NavigateToPage('${cfg.fullPage}'),200)">View full</button>
-      ${cfg.editFn ? `<button class="mv2-save-btn" onclick="mv2CloseDetailSheet();setTimeout(()=>${cfg.editFn}('${id}'),200)">Edit</button>` : ''}
-    </div>
+    <button class="mv2-save-btn" style="background:transparent;color:#4f46e5;border:1px solid #4f46e5;width:100%;" onclick="mv2CloseDetailSheet();setTimeout(()=>mv2NavigateToPage('${cfg.fullPage}'),200)">View full ${cfg.fullPage}</button>
   `;
   if (window.lucide) lucide.createIcons();
 }
@@ -10910,11 +11284,15 @@ function mv2DetailConfig(type, id) {
     if (a.minAMB) stats.push({ label: 'Min', value: fmt(a.minAMB) });
     return {
       title: a.bank || a.name,
-      icon: 'building-2', iconClass: ic,
+      icon: 'building-2', iconClass: ic, tint: 't-acct',
       bigNumber: fmt(a.balance),
       subtitle: `${a.name} · ${a.type}${last4 ? ' · ··' + last4 : ''}`,
       stats, fullPage: 'accounts',
-      editFn: typeof openAccountModal === 'function' ? 'openAccountModal' : null
+      quickActions: [
+        { key: 'acct-pay', icon: 'arrow-up-right', label: 'Pay from', primary: true },
+        { key: 'acct-transfer', icon: 'arrows-left-right', label: 'Transfer' },
+        { key: 'acct-edit', icon: 'edit', label: 'Edit' }
+      ]
     };
   }
   if (type === 'card') {
@@ -10924,7 +11302,7 @@ function mv2DetailConfig(type, id) {
     const util = c.limit > 0 ? Math.round(out / +c.limit * 100) : 0;
     return {
       title: c.issuer || c.name,
-      icon: 'credit-card', iconClass: 'mv2-ic-purple',
+      icon: 'credit-card', iconClass: 'mv2-ic-purple', tint: 't-card',
       bigNumber: fmt(out),
       subtitle: `${c.name}${last4 ? ' · ··' + last4 : ''}`,
       bigSub: 'outstanding',
@@ -10934,14 +11312,18 @@ function mv2DetailConfig(type, id) {
         { label: 'Annual', value: c.annualFee ? fmt(c.annualFee) : '—' }
       ],
       fullPage: 'cards',
-      editFn: typeof openCardModal === 'function' ? 'openCardModal' : null
+      quickActions: [
+        { key: 'card-pay', icon: 'cash', label: 'Pay now', primary: true },
+        { key: 'card-statement', icon: 'receipt', label: 'Statement' },
+        { key: 'card-edit', icon: 'edit', label: 'Edit' }
+      ]
     };
   }
   if (type === 'loan') {
     const l = (state.loans || []).find(x => x.id === id); if (!l) return null;
     return {
       title: l.lender || l.name,
-      icon: 'landmark', iconClass: 'mv2-ic-red',
+      icon: 'landmark', iconClass: 'mv2-ic-red', tint: 't-loan',
       bigNumber: fmt(l.outstanding),
       subtitle: `${l.name || l.type} · ${l.type || 'Loan'}`,
       bigSub: 'outstanding',
@@ -10951,7 +11333,11 @@ function mv2DetailConfig(type, id) {
         { label: 'Months', value: l.tenureLeftMonths || l.originalTenureMonths || '—' }
       ],
       fullPage: 'loans',
-      editFn: typeof openLoanModal === 'function' ? 'openLoanModal' : null
+      quickActions: [
+        { key: 'loan-emi', icon: 'cash', label: 'Pay EMI', primary: true },
+        { key: 'loan-prepay', icon: 'fast-forward', label: 'Prepay' },
+        { key: 'loan-edit', icon: 'edit', label: 'Edit' }
+      ]
     };
   }
   if (type === 'investment') {
@@ -10960,7 +11346,7 @@ function mv2DetailConfig(type, id) {
     const pct = i.invested > 0 ? (gain / +i.invested * 100).toFixed(1) : 0;
     return {
       title: i.name,
-      icon: 'trending-up', iconClass: 'mv2-ic-green',
+      icon: 'trending-up', iconClass: 'mv2-ic-green', tint: 't-invest',
       bigNumber: fmt(i.currentValue || i.invested),
       subtitle: `${i.type || 'Investment'}${i.provider ? ' · ' + i.provider : ''}`,
       bigSub: `${gain >= 0 ? '+' : ''}${fmt(gain)} (${gain >= 0 ? '+' : ''}${pct}%)`,
@@ -10971,14 +11357,18 @@ function mv2DetailConfig(type, id) {
         { label: 'Class', value: i.assetClass || '—' }
       ],
       fullPage: 'investments',
-      editFn: typeof openInvestmentModal === 'function' ? 'openInvestmentModal' : null
+      quickActions: [
+        { key: 'inv-buy', icon: 'plus', label: 'Buy more', primary: true },
+        { key: 'inv-history', icon: 'history', label: 'History' },
+        { key: 'inv-edit', icon: 'edit', label: 'Edit' }
+      ]
     };
   }
   if (type === 'insurance') {
     const p = (state.insurance || []).find(x => x.id === id); if (!p) return null;
     return {
       title: p.policyName || p.insurer,
-      icon: 'shield-check', iconClass: 'mv2-ic-blue',
+      icon: 'shield-check', iconClass: 'mv2-ic-blue', tint: 't-insure',
       bigNumber: fmt(p.sumAssured),
       subtitle: `${p.type || 'Policy'}${p.policyNumber ? ' · ' + p.policyNumber : ''}`,
       bigSub: 'cover',
@@ -10988,7 +11378,11 @@ function mv2DetailConfig(type, id) {
         { label: 'Renews', value: p.renewalDate ? fmtDate(p.renewalDate) : '—' }
       ],
       fullPage: 'insurance',
-      editFn: typeof openInsuranceModal === 'function' ? 'openInsuranceModal' : null
+      quickActions: [
+        { key: 'ins-premium', icon: 'cash', label: 'Pay premium', primary: true },
+        { key: 'ins-renew', icon: 'refresh-cw', label: 'Renew' },
+        { key: 'ins-edit', icon: 'edit', label: 'Edit' }
+      ]
     };
   }
   return null;
@@ -11002,6 +11396,61 @@ function mv2DetailRecent(type, id) {
   if (type === 'loan') return txns.filter(t => t.loanId === id).sort(sortDesc);
   if (type === 'insurance') return txns.filter(t => t.insuranceId === id).sort(sortDesc);
   return [];
+}
+
+/* Quick-action dispatcher for detail sheet tiles */
+function mv2QAct(action, id) {
+  mv2CloseDetailSheet();
+  setTimeout(() => {
+    switch (action) {
+      case 'acct-pay':
+        openTxnModal(null, { type: 'expense', fromAccountId: id }); break;
+      case 'acct-transfer':
+        openTxnModal(null, { type: 'transfer', fromAccountId: id }); break;
+      case 'acct-edit':
+        if (typeof openAccountModal === 'function') openAccountModal(id); break;
+      case 'card-pay': {
+        const c = (state.cards || []).find(x => x.id === id);
+        openTxnModal(null, { type: 'settlement', cardId: id, payee: c?.issuer || c?.name || '' });
+        break;
+      }
+      case 'card-statement':
+        mv2NavigateToPage('cards'); break;
+      case 'card-edit':
+        if (typeof openCardModal === 'function') openCardModal(id); break;
+      case 'loan-emi': {
+        const l = (state.loans || []).find(x => x.id === id);
+        openTxnModal(null, { type: 'expense', category: 'EMI', amount: l?.currentEmi || l?.originalEmi || l?.emi || '', payee: l?.lender || l?.name || '', note: 'EMI: ' + (l?.name || '') });
+        break;
+      }
+      case 'loan-prepay': {
+        const l = (state.loans || []).find(x => x.id === id);
+        openTxnModal(null, { type: 'expense', category: 'EMI', payee: l?.lender || l?.name || '', note: 'Prepayment: ' + (l?.name || '') });
+        break;
+      }
+      case 'loan-edit':
+        if (typeof openLoanModal === 'function') openLoanModal(id); break;
+      case 'inv-buy': {
+        const i = (state.investments || []).find(x => x.id === id);
+        openTxnModal(null, { type: 'expense', category: 'Investment', payee: i?.name || '', note: 'Buy: ' + (i?.name || '') });
+        break;
+      }
+      case 'inv-history':
+        if (typeof openInvestmentTxns === 'function') openInvestmentTxns(id);
+        else mv2NavigateToPage('investments');
+        break;
+      case 'inv-edit':
+        if (typeof openInvModal === 'function') openInvModal(id); break;
+      case 'ins-premium': {
+        const p = (state.insurance || []).find(x => x.id === id);
+        openTxnModal(null, { type: 'expense', category: 'Insurance Premium', amount: p?.premium || '', payee: p?.insurer || '', note: 'Premium: ' + (p?.policyName || p?.insurer || '') });
+        break;
+      }
+      case 'ins-renew':
+      case 'ins-edit':
+        if (typeof openInsModal === 'function') openInsModal(id); break;
+    }
+  }, 240);
 }
 
 /* ====== REPORTS ====== */
@@ -11034,8 +11483,8 @@ function mv2Reports(body) {
   const now = new Date();
   const ms = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
   const mTxns = (state.transactions || []).filter(t => t.status !== 'Draft' && t.date >= ms);
-  const income = mTxns.filter(t => t.type === 'Income').reduce((s,t) => s + +t.amount, 0);
-  const expense = mTxns.filter(t => t.type === 'Expense').reduce((s,t) => s + +t.amount, 0);
+  const income = mTxns.filter(t => t.type === 'income').reduce((s,t) => s + +t.amount, 0);
+  const expense = mTxns.filter(t => t.type === 'expense').reduce((s,t) => s + +t.amount, 0);
   const monthlyExp = expense || 1;
   const emergencyMonths = liquid / monthlyExp;
   const savRate = income > 0 ? Math.round((income - expense) / income * 100) : 0;
