@@ -4709,13 +4709,38 @@ function loanCardHTML(l) {
 }
 
 function openLoanModal(id) {
-  const l = id ? getLoan(id) : { status:'Active', type:'Home', rateType:'Fixed' };
+  const l = id ? getLoan(id) : { status:'Active', type:'Home', rateType:'Fixed', source:'bank', gstOnInterest:false, gstRate:18 };
+  const source = l.source || 'bank';
   const acctOpts = state.accounts.filter(a => a.status === 'Active' && !['Fixed Deposit','Recurring Deposit'].includes(a.type))
     .map(a => `<option value="${a.id}" ${l.paidFromAccountId === a.id ? 'selected' : ''}>${escapeHTML(a.name)}</option>`).join('');
+  const cardOpts = state.cards.filter(c => c.status !== 'Closed')
+    .map(c => `<option value="${c.id}" ${l.cardId === c.id ? 'selected' : ''}>${escapeHTML(c.issuer || c.name)} · ${escapeHTML(c.name)}${c.last4 ? ' ··'+c.last4 : ''}</option>`).join('');
   openModal(id ? 'Edit loan' : 'Add loan', `
+    <div class="form-row">
+      <label>Loan source</label>
+      <div class="pill-group">
+        <button type="button" class="pill ${source==='bank'?'active':''}" onclick="setLoanSource('bank')"><i data-lucide="building-bank" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:3px;"></i>Bank loan</button>
+        <button type="button" class="pill ${source==='card'?'active':''}" onclick="setLoanSource('card')"><i data-lucide="credit-card" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:3px;"></i>Credit card loan</button>
+      </div>
+    </div>
+    <input type="hidden" id="lSource" value="${source}" />
     <div class="form-row form-row-2">
       <div><label>Loan name</label><input id="lName" value="${l.name ? escapeHTML(l.name) : ''}" autofocus /></div>
-      <div><label>Lender</label><input id="lLender" value="${l.lender ? escapeHTML(l.lender) : ''}" /></div>
+      <div id="lLenderWrap" style="display:${source==='card'?'none':''}"><label>Lender</label><input id="lLender" value="${l.lender ? escapeHTML(l.lender) : ''}" /></div>
+      <div id="lCardWrap" style="display:${source==='card'?'':'none'}"><label>From credit card</label><select id="lCard"><option value="">— pick a card —</option>${cardOpts}</select></div>
+    </div>
+    <div id="lGstWrap" style="display:${source==='card'?'':'none'};background:var(--surface-2);border-radius:var(--radius-md);padding:12px;margin-bottom:var(--md);">
+      <div class="row" style="align-items:center;gap:var(--md);margin-bottom:6px;">
+        <label style="margin:0;display:flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="lGst" ${(l.gstOnInterest!==false)?'checked':''} style="width:auto;" />
+          <strong style="font-size:13px;">Apply GST on interest portion of EMI</strong>
+        </label>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+          <input id="lGstRate" type="number" step="0.01" value="${l.gstRate ?? 18}" style="width:70px;" />
+          <span style="font-size:12px;color:var(--text-tertiary);">% GST</span>
+        </div>
+      </div>
+      <div class="text-xs text-tertiary">In India, GST is charged at 18% on the interest portion of every EMI for card-backed loans. Tracked separately for tax filing.</div>
     </div>
     <div class="form-row form-row-3">
       <div><label>Type</label><select id="lType">${LOAN_TYPES.map(t => `<option ${l.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
@@ -4752,15 +4777,50 @@ function openLoanModal(id) {
   `);
 }
 
+function setLoanSource(src) {
+  const hidden = document.getElementById('lSource'); if (hidden) hidden.value = src;
+  document.querySelectorAll('.pill-group .pill').forEach(p => {
+    if (p.onclick && p.onclick.toString().includes(`'${src}'`)) p.classList.add('active');
+    else if (p.onclick && p.onclick.toString().includes("setLoanSource(")) p.classList.remove('active');
+  });
+  document.getElementById('lLenderWrap').style.display = src === 'card' ? 'none' : '';
+  document.getElementById('lCardWrap').style.display = src === 'card' ? '' : 'none';
+  document.getElementById('lGstWrap').style.display = src === 'card' ? '' : 'none';
+  if (src === 'card') {
+    const gst = document.getElementById('lGst'); if (gst && !gst.dataset.userTouched) gst.checked = true;
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+// EMI breakdown helper — splits an EMI into principal + interest + (optional) GST
+// outstanding: balance going INTO this month; rate: annual % (e.g. 14)
+function computeEmiBreakdown(loan, outstanding, emiAmount) {
+  const monthlyRate = (+(loan.currentRate || loan.originalRate || 0)) / 12 / 100;
+  const interest = outstanding * monthlyRate;
+  const principal = Math.max(0, emiAmount - interest);
+  let gst = 0;
+  if (loan.gstOnInterest && loan.source === 'card') {
+    gst = interest * ((+loan.gstRate || 18) / 100);
+  }
+  return { principal, interest, gst, total: principal + interest + gst };
+}
+
 async function saveLoan(id) {
   const name = document.getElementById('lName').value.trim();
   if (!name) { toast('Name required','error'); return; }
+  const source = document.getElementById('lSource').value || 'bank';
   const emi = +document.getElementById('lEmi').value || 0;
   const rate = +document.getElementById('lRate').value || 0;
   const tenure = +document.getElementById('lTenure').value || 0;
+  const cardId = source === 'card' ? (document.getElementById('lCard').value || null) : null;
+  if (source === 'card' && !cardId) { toast('Pick a credit card','error'); return; }
+  const cardObj = cardId ? state.cards.find(c => c.id === cardId) : null;
+  const lender = source === 'card' ? (cardObj ? (cardObj.issuer || cardObj.name) : '') : document.getElementById('lLender').value.trim();
+  const gstOn = source === 'card' ? !!document.getElementById('lGst').checked : false;
+  const gstRate = +document.getElementById('lGstRate').value || 18;
   const obj = {
     id: id || uid(), name,
-    lender: document.getElementById('lLender').value.trim(),
+    lender,
     type: document.getElementById('lType').value,
     status: document.getElementById('lStatus').value,
     last4: document.getElementById('lLast4').value.trim(),
@@ -4778,7 +4838,11 @@ async function saveLoan(id) {
     paidFromAccountId: document.getElementById('lPaidFrom').value || null,
     processingFee: +document.getElementById('lProcFee').value || 0,
     otherCharges: +document.getElementById('lOther').value || 0,
-    notes: document.getElementById('lNotes').value.trim()
+    notes: document.getElementById('lNotes').value.trim(),
+    source,
+    cardId,
+    gstOnInterest: gstOn,
+    gstRate
   };
   const before = id ? getLoan(id) : null;
   await dbPut('loans', obj);
@@ -8202,7 +8266,7 @@ const TABLE_MAP = {
   people: { table: 'people', cols: {} },
   accounts: { table: 'accounts', cols: { minBalance:'min_balance', minBalanceType:'min_balance_type', interestRate:'interest_rate', interestPayout:'interest_payout', openingDate:'opening_date', maturityDate:'maturity_date', maturityAmount:'maturity_amount', jointHolder:'joint_holder' } },
   cards: { table: 'cards', cols: { creditLimit:'credit_limit', limit:'credit_limit', interestRate:'interest_rate', billDay:'bill_day', dueDay:'due_day', annualFee:'annual_fee', rewardType:'reward_type', rewardRate:'reward_rate', autoDebitAccountId:'auto_debit_account_id' } },
-  loans: { table: 'loans', cols: { sanctionedAmount:'sanctioned_amount', originalEmi:'original_emi', currentEmi:'current_emi', emiDay:'emi_day', originalRate:'original_rate', currentRate:'current_rate', rateType:'rate_type', disbursementDate:'disbursement_date', originalTenureMonths:'original_tenure_months', currentTenureRemaining:'current_tenure_remaining', paidFromAccountId:'paid_from_account_id', processingFee:'processing_fee', otherCharges:'other_charges' } },
+  loans: { table: 'loans', cols: { sanctionedAmount:'sanctioned_amount', originalEmi:'original_emi', currentEmi:'current_emi', emiDay:'emi_day', originalRate:'original_rate', currentRate:'current_rate', rateType:'rate_type', disbursementDate:'disbursement_date', originalTenureMonths:'original_tenure_months', currentTenureRemaining:'current_tenure_remaining', paidFromAccountId:'paid_from_account_id', processingFee:'processing_fee', otherCharges:'other_charges', cardId:'card_id', gstOnInterest:'gst_on_interest', gstRate:'gst_rate' } },
   loanEvents: { table: 'loan_events', cols: { loanId:'loan_id', eventType:'event_type', fromAccountId:'from_account_id', principalComponent:'principal_component', interestComponent:'interest_component', balanceAfter:'balance_after', oldValue:'old_value', newValue:'new_value' } },
   insurance: { table: 'insurance', cols: { policyLast4:'policy_last4', renewalDate:'renewal_date', startDate:'start_date', endDate:'end_date', insuredPersonIds:'insured_person_ids', paidFromAccountId:'paid_from_account_id', agentContact:'agent_contact' } },
   investments: { table: 'investments', cols: { currentValue:'current_value', sipAmount:'sip_amount', sipDay:'sip_day', paidFromAccountId:'paid_from_account_id', startDate:'start_date', maturityDate:'maturity_date', taxBenefit:'tax_benefit', assetClass:'asset_class' } },
@@ -11379,9 +11443,13 @@ function mv2CardCard(c) {
 }
 
 function mv2LoanCard(l) {
+  const isCard = l.source === 'card';
+  const gstBadge = (isCard && l.gstOnInterest) ? `<span style="background:#ede9fe;color:#7c3aed;font-size:9px;padding:2px 6px;border-radius:5px;margin-left:4px;font-weight:700;">+GST</span>` : '';
+  const icon = isCard ? 'credit-card' : 'landmark';
+  const iconClass = isCard ? 'mv2-ic-purple' : 'mv2-ic-red';
   return `<div class="mv2-mcard" onclick="mv2OpenDetailSheet('loan','${l.id}')"><div class="mv2-mcard-row">
-    <div class="mv2-li-ic mv2-ic-red"><i data-lucide="landmark"></i></div>
-    <div style="flex:1;min-width:0;"><div class="mv2-li-t">${escapeHTML(l.lender || l.name)}</div><div class="mv2-li-s">${escapeHTML(l.type || 'Loan')} · EMI ${fmt(l.currentEmi || l.originalEmi || l.emi)}</div></div>
+    <div class="mv2-li-ic ${iconClass}"><i data-lucide="${icon}"></i></div>
+    <div style="flex:1;min-width:0;"><div class="mv2-li-t">${isCard ? 'Card Loan' : escapeHTML(l.lender || l.name)}${gstBadge}</div><div class="mv2-li-s">${isCard ? escapeHTML(l.lender || l.name) + ' · ' : ''}${escapeHTML(l.type || 'Loan')} · EMI ${fmt(l.currentEmi || l.originalEmi || l.emi)}</div></div>
     <div style="text-align:right;"><div style="font-size:14px;font-weight:700;">${fmt(l.outstanding)}</div><div style="font-size:10px;color:#9ca3af;">left</div></div>
   </div></div>`;
 }
@@ -11529,16 +11597,26 @@ function mv2DetailConfig(type, id) {
   }
   if (type === 'loan') {
     const l = (state.loans || []).find(x => x.id === id); if (!l) return null;
+    const isCard = l.source === 'card';
+    const baseRate = +(l.currentRate || l.originalRate || l.rate || 0);
+    const gstRate = +(l.gstRate || 18);
+    const effRate = (isCard && l.gstOnInterest) ? (baseRate * (1 + gstRate/100)) : baseRate;
+    // Compute first-month interest + GST for breakdown (only if card-backed)
+    const monthlyRate = baseRate / 12 / 100;
+    const firstInterest = +(l.outstanding || 0) * monthlyRate;
+    const firstGst = (isCard && l.gstOnInterest) ? firstInterest * (gstRate/100) : 0;
     return {
-      title: l.lender || l.name,
-      icon: 'landmark', iconClass: 'mv2-ic-red', tint: 't-loan',
+      title: (isCard ? 'Card Loan · ' : '') + (l.lender || l.name),
+      icon: isCard ? 'credit-card' : 'landmark',
+      iconClass: isCard ? 'mv2-ic-purple' : 'mv2-ic-red',
+      tint: 't-loan',
       bigNumber: fmt(l.outstanding),
-      subtitle: `${l.name || l.type} · ${l.type || 'Loan'}`,
-      bigSub: 'outstanding',
+      subtitle: `${l.name || l.type} · ${l.type || 'Loan'}${isCard && l.gstOnInterest ? ' · +'+gstRate+'% GST' : ''}`,
+      bigSub: 'outstanding' + (isCard && l.gstOnInterest ? ` · effective ${effRate.toFixed(2)}%` : ''),
       stats: [
         { label: 'EMI', value: fmt(l.currentEmi || l.originalEmi || l.emi) },
-        { label: 'Rate', value: (l.currentRate || l.originalRate || l.rate || 0) + '%' },
-        { label: 'Months', value: l.tenureLeftMonths || l.originalTenureMonths || '—' }
+        { label: 'Rate', value: baseRate + '%' + (isCard && l.gstOnInterest ? '+G' : '') },
+        { label: isCard && l.gstOnInterest ? 'Next GST' : 'Months', value: isCard && l.gstOnInterest ? fmt(firstGst) : (l.tenureLeftMonths || l.originalTenureMonths || '—') }
       ],
       fullPage: 'loans',
       quickActions: [
@@ -11628,7 +11706,33 @@ function mv2QAct(action, id) {
         if (typeof openCardModal === 'function') openCardModal(id); break;
       case 'loan-emi': {
         const l = (state.loans || []).find(x => x.id === id);
-        openTxnModal(null, { type: 'expense', category: 'EMI', amount: l?.currentEmi || l?.originalEmi || l?.emi || '', payee: l?.lender || l?.name || '', note: 'EMI: ' + (l?.name || '') });
+        if (!l) break;
+        const baseEmi = +(l.currentEmi || l.originalEmi || l.emi || 0);
+        let amount = baseEmi;
+        let note = 'EMI: ' + (l.name || '');
+        let taxFlag = '';
+        let cardId = null;
+        let fromAccountId = l.paidFromAccountId || null;
+        // Card-backed loan: include GST and charge to card outstanding (not bank)
+        if (l.source === 'card') {
+          const bd = computeEmiBreakdown(l, +l.outstanding, baseEmi);
+          amount = baseEmi + bd.gst;
+          note = `EMI: ${l.name || ''} · Principal ₹${bd.principal.toFixed(0)} + Interest ₹${bd.interest.toFixed(0)}${bd.gst > 0 ? ' + GST ₹' + bd.gst.toFixed(0) + ' ('+(l.gstRate||18)+'%)' : ''}`;
+          if (bd.gst > 0) taxFlag = 'GST';
+          cardId = l.cardId;
+          fromAccountId = null;
+        }
+        openTxnModal(null, {
+          type: l.source === 'card' ? 'settlement' : 'expense',
+          category: 'EMI',
+          amount,
+          payee: l.lender || l.name || '',
+          note,
+          taxFlag,
+          cardId,
+          fromAccountId,
+          loanId: l.id
+        });
         break;
       }
       case 'loan-prepay': {
