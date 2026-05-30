@@ -2318,8 +2318,8 @@ body.mv2.mv2-page-mode .topbar { padding-left: 64px; }
    1. INDEXEDDB LAYER
 ============================================================ */
 const DB_NAME = 'FinancePortal';
-const DB_VERSION = 3;
-const STORES = ['settings','people','accounts','cards','loans','loanEvents','insurance','investments','transactions','recurring','categories','subcategories','taxFlags','auditLog','statementUploads','investmentTxns','attachments','netWorthSnapshots'];
+const DB_VERSION = 4;
+const STORES = ['settings','people','accounts','cards','loans','loanEvents','insurance','investments','transactions','recurring','categories','subcategories','taxFlags','auditLog','statementUploads','investmentTxns','attachments','netWorthSnapshots','budgets','goals'];
 
 let db;
 
@@ -2421,7 +2421,8 @@ const state = {
   people: [], accounts: [], cards: [], loans: [], loanEvents: [],
   insurance: [], investments: [], transactions: [], recurring: [],
   categories: [], subcategories: [], taxFlags: [], statementUploads: [],
-  investmentTxns: [], attachments: [], netWorthSnapshots: []
+  investmentTxns: [], attachments: [], netWorthSnapshots: [],
+  budgets: [], goals: []
 };
 
 const DEFAULT_SETTINGS = {
@@ -2918,6 +2919,105 @@ async function generateRecurringDrafts() {
   if (dedupedCount > 0) {
     console.log(`generateRecurringDrafts: removed ${dedupedCount} duplicate draft(s)`);
   }
+  return created;
+}
+
+/* ============================================================
+   LOAN EMI AUTO-DRAFT ENGINE
+   Mirrors the recurring engine, driven by Loan's emiDay/currentEmi.
+   - Card-backed loans → type='settlement' (charges card outstanding) + GST
+   - Bank loans → type='expense' from paidFromAccountId
+   - Source-tagged with 'Loan EMI' so they're distinguishable from manual entries
+============================================================ */
+async function generateLoanEmiDrafts() {
+  const localDateStr = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  let created = 0, dedupedCount = 0;
+  const horizon = 12 * 31; // 12 months ahead
+  const start = todayDate();
+  const end = new Date(start); end.setDate(end.getDate() + horizon);
+  for (const l of (state.loans || []).filter(x => x.status === 'Active')) {
+    const emiAmount = +(l.currentEmi || l.originalEmi || 0);
+    const emiDay = +(l.emiDay || 0);
+    if (emiAmount <= 0 || emiDay < 1 || emiDay > 31) continue;
+    // Dedupe existing same-loan same-date drafts
+    const seen = new Map();
+    const dupeIds = [];
+    for (const t of state.transactions) {
+      if (t.loanId !== l.id || t.status !== 'Draft') continue;
+      if (seen.has(t.date)) dupeIds.push(t.id);
+      else seen.set(t.date, t.id);
+    }
+    if (dupeIds.length > 0) {
+      state.transactions = state.transactions.filter(x => !dupeIds.includes(x.id));
+      await Promise.all(dupeIds.map(did => dbDel('transactions', did).catch(()=>{})));
+      dedupedCount += dupeIds.length;
+    }
+    // Build firing dates for next 12 months
+    const dates = [];
+    let cur = new Date(start);
+    for (let i = 0; i < 13; i++) {
+      const monthDay = Math.min(emiDay, new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate());
+      const fire = new Date(cur.getFullYear(), cur.getMonth(), monthDay);
+      if (fire >= start && fire <= end) dates.push(localDateStr(fire));
+      cur.setMonth(cur.getMonth() + 1);
+    }
+    // Compute draft fields per loan type
+    const isCardLoan = l.source === 'card';
+    let amount = emiAmount;
+    let txnType = 'expense';
+    let taxFlag = '';
+    let cardId = null;
+    let fromAccountId = l.paidFromAccountId || null;
+    let toAccountId = null;
+    let noteSuffix = '';
+    if (isCardLoan) {
+      const bd = (typeof computeEmiBreakdown === 'function')
+        ? computeEmiBreakdown(l, +l.outstanding || 0, emiAmount)
+        : { principal: emiAmount, interest: 0, gst: 0 };
+      amount = emiAmount + (bd.gst || 0);
+      txnType = 'settlement';
+      cardId = l.cardId || null;
+      fromAccountId = null;
+      if (bd.gst > 0) taxFlag = 'GST';
+      noteSuffix = bd.gst > 0 ? ` (incl. GST ${fmt(bd.gst)})` : '';
+    }
+    // Create drafts for dates that don't already have one for this loan
+    const newDrafts = [];
+    for (const d of dates) {
+      const exists = state.transactions.some(t => t.loanId === l.id && t.date === d);
+      if (exists) continue;
+      const draft = {
+        id: uid(),
+        type: txnType,
+        status: 'Draft',
+        source: 'Loan EMI',
+        date: d,
+        amount,
+        category: 'EMI',
+        subcategory: '',
+        fromAccountId,
+        toAccountId,
+        cardId,
+        loanId: l.id,
+        insuranceId: null,
+        recurringId: null,
+        payee: l.lender || l.name || '',
+        mode: '',
+        reference: '',
+        taxFlag,
+        note: `EMI: ${l.name || ''}${noteSuffix}`,
+        draftCreatedAt: nowISO(),
+        settledAt: null
+      };
+      newDrafts.push(draft);
+      state.transactions.push(draft);
+      created++;
+    }
+    if (newDrafts.length) {
+      await Promise.all(newDrafts.map(draft => dbPut('transactions', draft).catch(e => console.warn('loan EMI draft failed', e))));
+    }
+  }
+  if (dedupedCount > 0) console.log(`generateLoanEmiDrafts: removed ${dedupedCount} duplicate draft(s)`);
   return created;
 }
 
@@ -4848,7 +4948,19 @@ async function saveLoan(id) {
   await dbPut('loans', obj);
   if (id) { const i = state.loans.findIndex(x => x.id === id); state.loans[i] = obj; } else state.loans.push(obj);
   await audit(id ? 'update' : 'create', 'loan', obj.id, before, obj);
-  closeModal(); toast('Saved','success'); renderCurrent();
+  // Clear stale future EMI drafts for this loan (will be regenerated with new amount/day/source)
+  let regen = 0;
+  if (id) {
+    const futureDrafts = state.transactions.filter(t => t.loanId === id && t.status === 'Draft' && t.date >= today() && t.source === 'Loan EMI');
+    regen = futureDrafts.length;
+    state.transactions = state.transactions.filter(t => !(t.loanId === id && t.status === 'Draft' && t.date >= today() && t.source === 'Loan EMI'));
+    await Promise.all(futureDrafts.map(d => dbDel('transactions', d.id).catch(()=>{})));
+  }
+  // Regenerate fresh EMI drafts (also covers new loans)
+  const created = await generateLoanEmiDrafts();
+  closeModal();
+  toast(id ? `Saved — ${regen} draft${regen===1?'':'s'} refreshed, ${created} created` : `Saved — ${created} EMI draft${created===1?'':'s'} created`, 'success');
+  renderCurrent();
 }
 
 async function deleteLoan(id) {
@@ -4860,8 +4972,13 @@ async function deleteLoan(id) {
   const events = state.loanEvents.filter(e => e.loanId === id);
   for (const e of events) await dbDel('loanEvents', e.id);
   state.loanEvents = state.loanEvents.filter(e => e.loanId !== id);
+  // Delete future EMI drafts tied to this loan
+  const futureDrafts = state.transactions.filter(t => t.loanId === id && t.status === 'Draft' && t.date >= today());
+  state.transactions = state.transactions.filter(t => !(t.loanId === id && t.status === 'Draft' && t.date >= today()));
+  await Promise.all(futureDrafts.map(d => dbDel('transactions', d.id).catch(()=>{})));
   await audit('delete', 'loan', id, l, null);
-  toast('Deleted','success'); renderCurrent();
+  toast(`Deleted${futureDrafts.length?` (${futureDrafts.length} EMI draft${futureDrafts.length===1?'':'s'} also removed)`:''}`,'success');
+  renderCurrent();
 }
 
 function payEmi(loanId) {
@@ -8276,7 +8393,9 @@ const TABLE_MAP = {
   subcategories: { table: 'subcategories', cols: { categoryId:'category_id', displayOrder:'display_order' } },
   taxFlags: { table: 'tax_flags', cols: { displayOrder:'display_order' } },
   statementUploads: { table: 'statement_uploads', cols: { cardId:'card_id', cycleStart:'cycle_start', cycleEnd:'cycle_end', statementBalance:'statement_balance', appBalance:'app_balance', uploadedAt:'uploaded_at' } },
-  auditLog: { table: 'audit_log', cols: { entityType:'entity_type', entityId:'entity_id', beforeData:'before_data', afterData:'after_data' } }
+  auditLog: { table: 'audit_log', cols: { entityType:'entity_type', entityId:'entity_id', beforeData:'before_data', afterData:'after_data' } },
+  budgets: { table: 'budgets', cols: { monthlyAmount:'monthly_amount', alertThreshold:'alert_threshold' } },
+  goals: { table: 'goals', cols: { targetAmount:'target_amount', currentAmount:'current_amount', targetDate:'target_date', linkedAccountId:'linked_account_id' } }
 };
 
 function toSnake(obj, mapEntry) {
@@ -8648,6 +8767,7 @@ async function enterProfile(id) {
   // Set up realtime subs (other-device changes update state)
   setupRealtimeSync();
   await generateRecurringDrafts();
+  if (typeof generateLoanEmiDrafts === 'function') await generateLoanEmiDrafts();
   renderCurrent();
   refreshIcons();
 }
@@ -9697,6 +9817,7 @@ async function bootLocalOnly() {
   buildNav();
   document.getElementById('themeToggle').onclick = toggleTheme;
   await generateRecurringDrafts();
+  if (typeof generateLoanEmiDrafts === 'function') await generateLoanEmiDrafts();
   renderCurrent();
   refreshIcons();
 }
@@ -10729,7 +10850,7 @@ function mv2RenderHeader() {
 
   // Subpage header (back arrow + title + optional action)
   if (mv2State.subPage) {
-    const titles = { recurring: 'Recurring templates', transactions: 'Transactions' };
+    const titles = { recurring: 'Recurring templates', transactions: 'Transactions', budgets: 'Budgets', goals: 'Goals' };
     let actionBtns = '';
     if (mv2State.subPage === 'recurring') {
       actionBtns = `<button class="mv2-iconbtn" onclick="if(typeof openRecurringModal==='function')openRecurringModal()"><i data-lucide="plus"></i></button>`;
@@ -10738,6 +10859,10 @@ function mv2RenderHeader() {
       actionBtns = `
         <button class="mv2-iconbtn" onclick="mv2ToggleTxnSearch()"><i data-lucide="search"></i></button>
         <button class="mv2-iconbtn" onclick="mv2OpenTxnFilters()" style="position:relative;"><i data-lucide="sliders-horizontal"></i>${hasFilters ? '<span class="badge-dot" style="background:#4f46e5;"></span>' : ''}</button>`;
+    } else if (mv2State.subPage === 'budgets') {
+      actionBtns = `<button class="mv2-iconbtn" onclick="openBudgetModal()"><i data-lucide="plus"></i></button>`;
+    } else if (mv2State.subPage === 'goals') {
+      actionBtns = `<button class="mv2-iconbtn" onclick="openGoalModal()"><i data-lucide="plus"></i></button>`;
     }
     h.innerHTML = `
       <div class="mv2-header">
@@ -11064,6 +11189,8 @@ function mv2RenderBody() {
   // Subpage takes priority over tab
   if (mv2State.subPage === 'recurring') { mv2RecurringPage(body); return; }
   if (mv2State.subPage === 'transactions') { mv2TransactionsPage(body); return; }
+  if (mv2State.subPage === 'budgets') { mv2BudgetsPage(body); return; }
+  if (mv2State.subPage === 'goals') { mv2GoalsPage(body); return; }
   const renderers = { home: mv2Home, money: mv2Money, reports: mv2Reports, more: mv2More };
   (renderers[mv2State.tab] || mv2Home)(body);
 }
@@ -11842,12 +11969,18 @@ function mv2More(body) {
   const initial = (active?.name || userName).charAt(0).toUpperCase();
   const recurringCount = (state.recurring || []).filter(r => r.active !== false).length;
 
+  const budgetCount = (state.budgets || []).length;
+  const goalCount = (state.goals || []).filter(g => g.status === 'Active').length;
   const secs = [
+    { lbl: 'Plan', items: [
+      { ic: 'target', lbl: 'Budgets', page: 'budgets', badge: budgetCount, clr: '#dc2626' },
+      { ic: 'flag', lbl: 'Goals', page: 'goals', badge: goalCount, clr: '#059669' },
+      { ic: 'line-chart', lbl: 'Projection', page: 'projection', clr: '#4f46e5' }
+    ]},
     { lbl: 'Data', items: [
       { ic: 'users', lbl: 'People', page: 'people', clr: '#4f46e5' },
       { ic: 'repeat', lbl: 'Recurring templates', page: 'recurring', badge: recurringCount, clr: '#4f46e5' },
-      { ic: 'list', lbl: 'All transactions', page: 'transactions', clr: '#4f46e5' },
-      { ic: 'line-chart', lbl: 'Projection', page: 'projection', clr: '#4f46e5' }
+      { ic: 'list', lbl: 'All transactions', page: 'transactions', clr: '#4f46e5' }
     ]},
     { lbl: 'Tools', items: [
       { ic: 'download', lbl: 'Export & backup', page: 'export', clr: '#10b981' },
@@ -11887,6 +12020,276 @@ function mv2More(body) {
           </button>`).join('')}
       </div>`).join('')}
   `;
+}
+
+/* ====== Sprint 7 — Budgets & Goals: helpers + modals + mobile pages ====== */
+
+// Returns spent ₹ for a given category in a given month (e.g. "2026-05")
+function budgetSpent(category, monthK) {
+  if (!monthK) {
+    const n = new Date();
+    monthK = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;
+  }
+  return (state.transactions || [])
+    .filter(t => (t.type === 'expense' || t.type === 'settlement') && t.status !== 'Draft')
+    .filter(t => t.category === category && (t.date || '').startsWith(monthK))
+    .reduce((s, t) => s + +t.amount, 0);
+}
+
+function budgetStatus(b, monthK) {
+  const spent = budgetSpent(b.category, monthK);
+  const budget = +b.monthlyAmount || 0;
+  const pct = budget > 0 ? Math.round(spent / budget * 100) : 0;
+  const remaining = budget - spent;
+  const threshold = +(b.alertThreshold ?? 80);
+  let color = 'green', state_ = 'on-track';
+  if (spent > budget) { color = 'red'; state_ = 'over'; }
+  else if (pct >= threshold) { color = 'amber'; state_ = 'warning'; }
+  return { spent, budget, pct, remaining, color, state: state_ };
+}
+
+function goalProgress(g) {
+  const saved = +(g.currentAmount || 0);
+  const target = +(g.targetAmount || 0);
+  const pct = target > 0 ? Math.round(saved / target * 100) : 0;
+  let monthsLeft = null, requiredPerMonth = null, status = 'on-track';
+  if (g.targetDate) {
+    const target_d = new Date(g.targetDate);
+    const now = new Date();
+    monthsLeft = Math.max(0, Math.round((target_d - now) / (1000*60*60*24*30)));
+    if (monthsLeft > 0) {
+      requiredPerMonth = (target - saved) / monthsLeft;
+      // Estimate current savings rate from last 3 months net (avg)
+      const last3 = (state.transactions || []).filter(t => t.status !== 'Draft' && t.date >= new Date(now.getFullYear(), now.getMonth()-3, 1).toISOString().slice(0,10));
+      const inc = last3.filter(t => t.type === 'income').reduce((s,t) => s + +t.amount, 0);
+      const exp = last3.filter(t => t.type === 'expense' || t.type === 'settlement').reduce((s,t) => s + +t.amount, 0);
+      const monthlySavings = (inc - exp) / 3;
+      if (monthlySavings < requiredPerMonth * 0.7) status = 'behind';
+      else if (monthlySavings > requiredPerMonth * 1.2) status = 'ahead';
+    } else if (saved < target) status = 'behind';
+  }
+  if (saved >= target && target > 0) status = 'completed';
+  return { saved, target, pct: Math.min(100, pct), monthsLeft, requiredPerMonth, status };
+}
+
+/* Budget add/edit modal */
+function openBudgetModal(id) {
+  const b = id ? (state.budgets || []).find(x => x.id === id) : { monthlyAmount: 0, alertThreshold: 80 };
+  if (id && !b) return;
+  const catOpts = (state.categories || []).filter(c => c.kind === 'expense').sort((a,b) => a.displayOrder - b.displayOrder).map(c => `<option value="${escapeHTML(c.name)}" ${b.category === c.name ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
+  openModal(id ? 'Edit budget' : 'Add budget', `
+    <div class="form-row form-row-2">
+      <div><label>Category</label><select id="bCategory">${catOpts}</select></div>
+      <div><label>Monthly budget (₹)</label><input id="bAmount" type="number" value="${b.monthlyAmount || ''}" autofocus /></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Alert at (% used)</label><input id="bThreshold" type="number" min="50" max="100" value="${b.alertThreshold ?? 80}" /></div>
+      <div style="display:flex;align-items:end;"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;"><input type="checkbox" id="bRolling" ${b.rolling?'checked':''} style="width:auto;" />Roll over unused</label></div>
+    </div>
+    <div class="form-row"><div><label>Notes</label><textarea id="bNotes">${b.notes ? escapeHTML(b.notes) : ''}</textarea></div></div>
+  `, `
+    ${id ? `<button class="btn btn-danger" onclick="deleteBudget('${id}')">Delete</button>` : ''}
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveBudget('${id || ''}')">Save</button>
+  `);
+}
+
+async function saveBudget(id) {
+  const category = document.getElementById('bCategory').value;
+  const monthlyAmount = +document.getElementById('bAmount').value || 0;
+  if (!category) { toast('Pick a category','error'); return; }
+  if (monthlyAmount <= 0) { toast('Budget amount required','error'); return; }
+  // Prevent duplicate category budgets
+  const existing = (state.budgets || []).find(x => x.category === category && x.id !== id);
+  if (existing) { toast(`Budget for "${category}" already exists`,'error'); return; }
+  const obj = {
+    id: id || uid(),
+    category,
+    monthlyAmount,
+    alertThreshold: +document.getElementById('bThreshold').value || 80,
+    rolling: !!document.getElementById('bRolling').checked,
+    notes: (document.getElementById('bNotes').value || '').trim()
+  };
+  const before = id ? (state.budgets || []).find(x => x.id === id) : null;
+  await dbPut('budgets', obj);
+  if (id) { const i = state.budgets.findIndex(x => x.id === id); state.budgets[i] = obj; } else state.budgets.push(obj);
+  audit(id ? 'update' : 'create', 'budget', obj.id, before, obj).catch(()=>{});
+  closeModal(); toast('Budget saved','success'); renderCurrent();
+}
+
+async function deleteBudget(id) {
+  if (!confirm('Delete this budget? Spending will no longer be tracked against it.')) return;
+  const b = (state.budgets || []).find(x => x.id === id);
+  await dbDel('budgets', id);
+  state.budgets = (state.budgets || []).filter(x => x.id !== id);
+  audit('delete', 'budget', id, b, null).catch(()=>{});
+  closeModal(); toast('Budget deleted','success'); renderCurrent();
+}
+
+/* Goal add/edit modal */
+const GOAL_ICONS = ['target','shield','plane','home','car','heart','gift','graduation-cap','briefcase','piggy-bank','wallet','umbrella'];
+function openGoalModal(id) {
+  const g = id ? (state.goals || []).find(x => x.id === id) : { status:'Active', icon:'target' };
+  if (id && !g) return;
+  const acctOpts = (state.accounts || []).filter(a => a.status === 'Active').map(a => `<option value="${a.id}" ${g.linkedAccountId === a.id ? 'selected' : ''}>${escapeHTML(a.name)} (${fmt(a.balance)})</option>`).join('');
+  openModal(id ? 'Edit goal' : 'Add savings goal', `
+    <div class="form-row form-row-2">
+      <div><label>Goal name</label><input id="gName" value="${g.name ? escapeHTML(g.name) : ''}" placeholder="Emergency fund" autofocus /></div>
+      <div><label>Icon</label><select id="gIcon">${GOAL_ICONS.map(i => `<option value="${i}" ${g.icon===i?'selected':''}>${i}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Target amount (₹)</label><input id="gTarget" type="number" value="${g.targetAmount || ''}" /></div>
+      <div><label>Currently saved (₹)</label><input id="gCurrent" type="number" value="${g.currentAmount || 0}" /></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Target date</label><input id="gDate" type="date" value="${g.targetDate || ''}" /></div>
+      <div><label>Status</label><select id="gStatus">${['Active','Paused','Completed','Cancelled'].map(s => `<option ${g.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row"><div><label>Linked account (optional)</label><select id="gAccount"><option value="">— none —</option>${acctOpts}</select></div></div>
+    <div class="form-row"><div><label>Notes</label><textarea id="gNotes">${g.notes ? escapeHTML(g.notes) : ''}</textarea></div></div>
+  `, `
+    ${id ? `<button class="btn btn-danger" onclick="deleteGoal('${id}')">Delete</button>` : ''}
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveGoal('${id || ''}')">Save</button>
+  `);
+}
+
+async function saveGoal(id) {
+  const name = document.getElementById('gName').value.trim();
+  if (!name) { toast('Goal name required','error'); return; }
+  const targetAmount = +document.getElementById('gTarget').value || 0;
+  if (targetAmount <= 0) { toast('Target amount required','error'); return; }
+  const obj = {
+    id: id || uid(),
+    name,
+    icon: document.getElementById('gIcon').value || 'target',
+    targetAmount,
+    currentAmount: +document.getElementById('gCurrent').value || 0,
+    targetDate: document.getElementById('gDate').value || null,
+    status: document.getElementById('gStatus').value,
+    linkedAccountId: document.getElementById('gAccount').value || null,
+    notes: (document.getElementById('gNotes').value || '').trim()
+  };
+  const before = id ? (state.goals || []).find(x => x.id === id) : null;
+  await dbPut('goals', obj);
+  if (id) { const i = state.goals.findIndex(x => x.id === id); state.goals[i] = obj; } else state.goals.push(obj);
+  audit(id ? 'update' : 'create', 'goal', obj.id, before, obj).catch(()=>{});
+  closeModal(); toast('Goal saved','success'); renderCurrent();
+}
+
+async function deleteGoal(id) {
+  if (!confirm('Delete this goal?')) return;
+  const g = (state.goals || []).find(x => x.id === id);
+  await dbDel('goals', id);
+  state.goals = (state.goals || []).filter(x => x.id !== id);
+  audit('delete', 'goal', id, g, null).catch(()=>{});
+  closeModal(); toast('Goal deleted','success'); renderCurrent();
+}
+
+/* ====== Mobile Budgets subpage ====== */
+function mv2BudgetsPage(body) {
+  const n = new Date();
+  const monthK = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;
+  const budgets = state.budgets || [];
+  const totals = budgets.reduce((acc, b) => {
+    const s = budgetStatus(b, monthK);
+    acc.spent += s.spent;
+    acc.budget += s.budget;
+    return acc;
+  }, { spent: 0, budget: 0 });
+  const totalPct = totals.budget > 0 ? Math.round(totals.spent / totals.budget * 100) : 0;
+  const overall = totals.spent > totals.budget ? 'red' : (totalPct >= 80 ? 'amber' : 'green');
+  const daysLeft = new Date(n.getFullYear(), n.getMonth()+1, 0).getDate() - n.getDate();
+
+  body.innerHTML = `
+    ${budgets.length > 0 ? `
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:13px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
+          <div><div style="font-size:10px;color:#6b7280;">${n.toLocaleDateString('en-IN',{month:'long',year:'numeric'})} · spent</div><div style="font-size:20px;font-weight:700;">${fmt(totals.spent)} <span style="font-size:11px;color:#6b7280;font-weight:500;">of ${fmt(totals.budget)}</span></div></div>
+          <div style="text-align:right;"><div style="font-size:10px;color:#6b7280;">${totalPct}% used</div><div style="font-size:11px;font-weight:700;color:${overall==='red'?'#dc2626':overall==='amber'?'#d97706':'#10b981'};">${overall==='red'?'Over budget':overall==='amber'?'Watch':'On track ✓'}</div></div>
+        </div>
+        <div style="height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden;"><div style="width:${Math.min(100, totalPct)}%;background:${overall==='red'?'#dc2626':overall==='amber'?'#d97706':'#10b981'};height:100%;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:#6b7280;"><span>${fmt(Math.max(0, totals.budget - totals.spent))} remaining</span><span>${daysLeft} days left</span></div>
+      </div>
+    ` : ''}
+    ${budgets.length === 0 ? `
+      <div class="mv2-empty t-acct" style="margin-top:8px;">
+        <div class="mv2-empty-ic"><i data-lucide="target"></i></div>
+        <div class="mv2-empty-t">No budgets yet</div>
+        <div class="mv2-empty-m">Set a monthly cap per category. Get visual warnings as you approach the limit and an alert if you go over.</div>
+      </div>
+      <button class="mv2-solid-btn t-acct" onclick="openBudgetModal()"><i data-lucide="plus"></i>Add budget</button>
+    ` : budgets.map(b => {
+      const s = budgetStatus(b, monthK);
+      const cat = (state.categories || []).find(c => c.name === b.category);
+      const icon = cat?.icon || 'circle';
+      const isOver = s.state === 'over';
+      const cardBg = isOver ? '#fee2e2' : '#fff';
+      const cardBorder = isOver ? '#fca5a5' : '#e5e7eb';
+      const barColor = s.color === 'red' ? '#dc2626' : s.color === 'amber' ? '#d97706' : '#10b981';
+      const icBg = s.color === 'red' ? '#fff' : s.color === 'amber' ? '#fef3c7' : '#d1fae5';
+      const icFg = s.color === 'red' ? '#dc2626' : s.color === 'amber' ? '#d97706' : '#059669';
+      const txtColor = isOver ? '#7f1d1d' : '#111';
+      const subColor = isOver ? '#991b1b' : '#6b7280';
+      const rightTxt = isOver ? `−${fmt(s.spent - s.budget)}` : `${fmt(s.remaining)} left`;
+      const rightColor = isOver ? '#dc2626' : (s.color === 'amber' ? '#d97706' : '#10b981');
+      return `<div class="mv2-mcard" style="background:${cardBg};border-color:${cardBorder};" onclick="openBudgetModal('${b.id}')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:${icBg};color:${icFg};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="${icon}" style="width:17px;height:17px;"></i></div>
+          <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:${txtColor};">${escapeHTML(b.category)}${isOver ? ' <i data-lucide="alert-triangle" style="width:13px;height:13px;vertical-align:-2px"></i>' : ''}</div><div style="font-size:10px;color:${subColor};">${fmt(s.spent)} of ${fmt(s.budget)} · ${s.pct}%</div></div>
+          <div style="font-size:13px;font-weight:700;color:${rightColor};">${rightTxt}</div>
+        </div>
+        <div style="height:6px;background:${isOver?'#fca5a5':'#f3f4f6'};border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100, s.pct)}%;background:${barColor};height:100%;"></div></div>
+      </div>`;
+    }).join('') + `<button class="mv2-add-tile t-acct" onclick="openBudgetModal()"><i data-lucide="plus"></i>Add budget</button>`}
+    <div style="height:24px;"></div>
+  `;
+  if (window.lucide) lucide.createIcons();
+}
+
+/* ====== Mobile Goals subpage ====== */
+function mv2GoalsPage(body) {
+  const goals = (state.goals || []).filter(g => g.status !== 'Cancelled');
+  const active = goals.filter(g => g.status === 'Active');
+  body.innerHTML = `
+    ${goals.length === 0 ? `
+      <div class="mv2-empty t-invest" style="margin-top:8px;">
+        <div class="mv2-empty-ic"><i data-lucide="target"></i></div>
+        <div class="mv2-empty-t">No goals yet</div>
+        <div class="mv2-empty-m">Set savings goals — emergency fund, house down payment, that big trip. Track progress and get the monthly amount needed to hit your target.</div>
+      </div>
+      <button class="mv2-solid-btn t-invest" onclick="openGoalModal()"><i data-lucide="plus"></i>Add savings goal</button>
+    ` : goals.map(g => {
+      const p = goalProgress(g);
+      const isDone = p.status === 'completed';
+      const isBehind = p.status === 'behind';
+      const bg = isDone ? '#d1fae5' : (isBehind ? '#fef3c7' : '#fff');
+      const border = isDone ? '#86efac' : (isBehind ? '#fde68a' : '#e5e7eb');
+      const txtColor = isBehind ? '#92400e' : (isDone ? '#065f46' : '#111');
+      const iconColor = isBehind ? '#d97706' : (isDone ? '#059669' : '#2563eb');
+      const iconBg = isBehind ? '#fff' : (isDone ? '#fff' : '#dbeafe');
+      const barFill = isBehind ? '#d97706' : (isDone ? '#10b981' : '#3b82f6');
+      const pctColor = isBehind ? '#d97706' : '#10b981';
+      const statusLabel = isDone ? '🎉 Goal reached' : (isBehind ? `Need ${fmt(p.requiredPerMonth || 0)}/mo` : (p.status === 'ahead' ? 'Ahead of plan ✓' : (p.requiredPerMonth !== null ? `Save ${fmt(p.requiredPerMonth)}/mo` : '')));
+      return `<div style="background:${bg};border:1px solid ${border};border-radius:18px;padding:16px;margin-bottom:12px;cursor:pointer;" onclick="openGoalModal('${g.id}')">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:${iconBg};color:${iconColor};display:flex;align-items:center;justify-content:center;"><i data-lucide="${g.icon || 'target'}" style="width:22px;height:22px;"></i></div>
+          <div style="flex:1;"><div style="font-size:14px;font-weight:700;color:${txtColor};">${escapeHTML(g.name)}</div><div style="font-size:10px;color:${txtColor};opacity:0.7;">${g.targetDate ? 'Target by ' + new Date(g.targetDate).toLocaleDateString('en-IN', {month:'short',year:'numeric'}) : 'No target date'}${g.status !== 'Active' ? ' · ' + g.status : ''}</div></div>
+        </div>
+        <div style="display:flex;align-items:end;justify-content:space-between;margin-bottom:10px;">
+          <div><div style="font-size:10px;color:${txtColor};opacity:0.7;">Saved</div><div style="font-size:20px;font-weight:700;color:${txtColor};">${fmt(p.saved)}</div></div>
+          <div style="text-align:right;"><div style="font-size:10px;color:${txtColor};opacity:0.7;">of ${fmt(p.target)}</div><div style="font-size:13px;font-weight:700;color:${pctColor};">${p.pct}% ${isDone?'🎉':'✓'}</div></div>
+        </div>
+        <div style="height:10px;background:#f3f4f6;border-radius:5px;overflow:hidden;"><div style="width:${p.pct}%;background:${barFill};height:100%;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:${txtColor};opacity:0.75;">
+          <span>${statusLabel}</span>
+          <span>${p.monthsLeft !== null ? p.monthsLeft + ' months left' : ''}</span>
+        </div>
+      </div>`;
+    }).join('') + `<button class="mv2-add-tile t-invest" onclick="openGoalModal()" style="margin-top:4px;"><i data-lucide="plus"></i>Add savings goal</button>`}
+    <div style="height:24px;"></div>
+  `;
+  if (window.lucide) lucide.createIcons();
 }
 
 /* ====== Mobile-native Recurring page ====== */
@@ -12432,7 +12835,7 @@ function mv2CloseSubpage() {
 /* ====== Navigate to a non-tab page (Settings, People, etc.) ====== */
 function mv2NavigateToPage(pageId) {
   // Mobile-native subpages handled by mv2OpenSubpage instead of desktop fallback
-  const mobileNative = ['recurring', 'transactions'];
+  const mobileNative = ['recurring', 'transactions', 'budgets', 'goals'];
   if (mobileNative.includes(pageId)) {
     mv2OpenSubpage(pageId);
     return;
