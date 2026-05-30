@@ -4852,7 +4852,13 @@ function openLoanModal(id) {
       <div><label>Current outstanding</label><input id="lOutstanding" type="number" value="${l.outstanding ?? ''}" /></div>
     </div>
     <div class="form-row form-row-2">
-      <div><label>EMI amount</label><input id="lEmi" type="number" value="${l.currentEmi ?? l.originalEmi ?? ''}" /></div>
+      <div>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <span>EMI amount</span>
+          <button type="button" class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:11px;font-weight:600;" onclick="calcEmiFromForm()" title="Calculate from principal, rate, tenure"><i data-lucide="calculator" style="width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:3px;"></i>Calc</button>
+        </label>
+        <input id="lEmi" type="number" value="${l.currentEmi ?? l.originalEmi ?? ''}" placeholder="Tap Calc to auto-fill" />
+      </div>
       <div><label>EMI day (1-31)</label><input id="lEmiDay" type="number" min="1" max="31" value="${l.emiDay ?? ''}" /></div>
     </div>
     <div class="form-row form-row-2">
@@ -5147,6 +5153,33 @@ function calcEMI(principal, annualRate, months) {
   return principal * r * p / (p - 1);
 }
 
+// Called from "Calc" button on loan form — auto-fills EMI from current form values
+function calcEmiFromForm() {
+  const principal = +document.getElementById('lSanctioned').value || +document.getElementById('lOutstanding').value || 0;
+  const rate = +document.getElementById('lRate').value || 0;
+  const tenure = +document.getElementById('lTenure').value || 0;
+  if (!principal || !rate || !tenure) {
+    toast('Fill principal, rate, and tenure first', 'warning');
+    return;
+  }
+  const emi = Math.round(calcEMI(principal, rate, tenure));
+  document.getElementById('lEmi').value = emi;
+  // For card loans with GST, show the user the GST-inclusive first-month payment
+  const source = (document.getElementById('lSource')?.value) || 'bank';
+  const gstOn = source === 'card' && document.getElementById('lGst')?.checked;
+  if (gstOn) {
+    const monthlyRate = rate / 12 / 100;
+    const firstInterest = principal * monthlyRate;
+    const gstRate = +document.getElementById('lGstRate')?.value || 18;
+    const firstGst = firstInterest * (gstRate / 100);
+    toast(`EMI ${fmt(emi)} · First month GST ${fmt(firstGst)} → first payment ${fmt(emi + firstGst)}`, 'success');
+  } else {
+    const totalPaid = emi * tenure;
+    const totalInterest = totalPaid - principal;
+    toast(`EMI ${fmt(emi)} · Total interest ${fmt(totalInterest)} over ${tenure} months`, 'success');
+  }
+}
+
 function calcMonthsForEMI(balance, emi, annualRate) {
   // n = ln(EMI / (EMI - B*r)) / ln(1 + r)
   const r = annualRate / 12 / 100;
@@ -5171,6 +5204,11 @@ function totalInterestForPlan(balance, emi, months, annualRate) {
 /* Generate full schedule from loan's event log + project forward */
 function generateLoanSchedule(loan) {
   const schedule = [];
+  // GST helper — returns gst amount for a given interest portion (0 for non-card loans)
+  const gstApplies = loan.source === 'card' && loan.gstOnInterest;
+  const gstRatePct = +(loan.gstRate || 18);
+  const gstFor = interest => gstApplies ? interest * (gstRatePct / 100) : 0;
+
   const events = state.loanEvents.filter(e => e.loanId === loan.id).sort((a,b) => a.date.localeCompare(b.date));
   let balance = +loan.sanctionedAmount;
   let emi = +loan.originalEmi;
@@ -5187,12 +5225,14 @@ function generateLoanSchedule(loan) {
       const monthlyRate = rate / 12 / 100;
       const interest = balance * monthlyRate;
       const principal = Math.min(emi - interest, balance);
+      const gst = gstFor(interest);
       balance -= principal;
       monthCount++;
       schedule.push({
         month: monthCount, date,
         openingBalance: balance + principal,
         emi, interest, principal,
+        gst, totalPayment: emi + gst,
         closingBalance: balance,
         status: 'Projected (pre-event)',
         eventType: null
@@ -5206,12 +5246,14 @@ function generateLoanSchedule(loan) {
       const monthlyRate = rate / 12 / 100;
       const interest = +ev.amount > balance * monthlyRate ? balance * monthlyRate : +ev.amount * 0.5;
       const principal = Math.min(+ev.amount - interest, balance);
+      const gst = gstFor(interest);
       balance = Math.max(0, balance - principal);
       monthCount++;
       schedule.push({
         month: monthCount, date: ev.date,
         openingBalance: balance + principal,
         emi: +ev.amount, interest, principal,
+        gst, totalPayment: +ev.amount + gst,
         closingBalance: balance,
         status: 'Paid',
         eventType: 'EMI'
@@ -5286,12 +5328,14 @@ function generateLoanSchedule(loan) {
       const interest = balance * monthlyRate;
       const principal = Math.min(emi - interest, balance);
       if (principal <= 0) break;
+      const gst = gstFor(interest);
       balance -= principal;
       monthCount++;
       schedule.push({
         month: monthCount, date,
         openingBalance: balance + principal,
         emi, interest, principal,
+        gst, totalPayment: emi + gst,
         closingBalance: balance,
         status: 'Planned',
         eventType: null
@@ -5317,16 +5361,23 @@ function openLoanSchedule(loanId) {
   });
   const years = Object.keys(byYear).sort();
   const totalInterest = schedule.filter(r => !r.eventType || r.eventType === 'EMI').reduce((s,r) => s + (r.interest || 0), 0);
+  const totalGst = schedule.filter(r => !r.eventType || r.eventType === 'EMI').reduce((s,r) => s + (r.gst || 0), 0);
+  const totalPaid = schedule.filter(r => !r.eventType || r.eventType === 'EMI').reduce((s,r) => s + (r.totalPayment || r.emi || 0), 0);
   const paidCount = schedule.filter(r => r.status === 'Paid').length;
   const plannedCount = schedule.filter(r => r.status === 'Planned').length;
+  const showGst = l.source === 'card' && l.gstOnInterest;
+  const baseRate = +(l.currentRate || l.originalRate || 0);
+  const effRate = showGst ? baseRate * (1 + (+l.gstRate || 18)/100) : baseRate;
   openModal(`Amortization: ${escapeHTML(l.name)}`, `
     <div class="grid grid-stats mb-md">
       <div class="card" style="padding:12px;"><div class="card-title">Outstanding</div><div class="fw-700" style="font-size:18px;color:${+l.outstanding > 0 ? 'var(--danger)' : 'var(--success)'}">${fmt(l.outstanding)}</div></div>
-      <div class="card" style="padding:12px;"><div class="card-title">Current EMI</div><div class="fw-700" style="font-size:18px;">${fmt(l.currentEmi || l.originalEmi)}</div></div>
-      <div class="card" style="padding:12px;"><div class="card-title">Rate</div><div class="fw-700" style="font-size:18px;">${l.currentRate || l.originalRate}%</div></div>
-      <div class="card" style="padding:12px;"><div class="card-title">Total Interest (lifetime)</div><div class="fw-700" style="font-size:18px;color:var(--warning)">${fmt(totalInterest)}</div></div>
+      <div class="card" style="padding:12px;"><div class="card-title">Current EMI${showGst ? ' (excl. GST)' : ''}</div><div class="fw-700" style="font-size:18px;">${fmt(l.currentEmi || l.originalEmi)}</div></div>
+      <div class="card" style="padding:12px;"><div class="card-title">Rate</div><div class="fw-700" style="font-size:18px;">${baseRate}%${showGst ? ` <span style="font-size:11px;color:var(--text-tertiary);">→ eff. ${effRate.toFixed(2)}%</span>` : ''}</div></div>
+      <div class="card" style="padding:12px;"><div class="card-title">Total Interest</div><div class="fw-700" style="font-size:18px;color:var(--warning)">${fmt(totalInterest)}</div></div>
+      ${showGst ? `<div class="card" style="padding:12px;"><div class="card-title">Total GST (${+l.gstRate || 18}%)</div><div class="fw-700" style="font-size:18px;color:#7c3aed;">${fmt(totalGst)}</div></div>` : ''}
+      ${showGst ? `<div class="card" style="padding:12px;"><div class="card-title">Total Paid (lifetime)</div><div class="fw-700" style="font-size:18px;">${fmt(totalPaid)}</div></div>` : ''}
     </div>
-    <div class="text-sm text-tertiary mb-md">${paidCount} paid · ${plannedCount} planned · ${schedule.filter(r => r.eventType && r.eventType !== 'EMI').length} adjustments</div>
+    <div class="text-sm text-tertiary mb-md">${paidCount} paid · ${plannedCount} planned · ${schedule.filter(r => r.eventType && r.eventType !== 'EMI').length} adjustments${showGst ? ' · GST tracked separately for tax filing' : ''}</div>
     ${years.length === 0 ? '<div class="empty"><div class="empty-sub">No schedule yet — record an EMI or add disbursement date.</div></div>' : years.map(yr => `
       <details ${yr === today().slice(0,4) ? 'open' : ''}>
         <summary style="cursor:pointer;padding:8px 12px;font-weight:700;background:var(--surface-2);border-radius:var(--radius-md);margin-bottom:8px;">
@@ -5334,7 +5385,7 @@ function openLoanSchedule(loanId) {
         </summary>
         <div class="tbl-wrap mb-md">
           <table class="tbl">
-            <thead><tr><th>#</th><th>Date</th><th class="num">Opening</th><th class="num">EMI</th><th class="num">Interest</th><th class="num">Principal</th><th class="num">Closing</th><th>Status</th></tr></thead>
+            <thead><tr><th>#</th><th>Date</th><th class="num">Opening</th><th class="num">EMI</th><th class="num">Interest</th><th class="num">Principal</th>${showGst ? '<th class="num" style="color:#7c3aed;">GST</th><th class="num" style="color:#7c3aed;">Total</th>' : ''}<th class="num">Closing</th><th>Status</th></tr></thead>
             <tbody>
               ${byYear[yr].map(r => `<tr style="${r.eventType && r.eventType !== 'EMI' ? 'background:var(--surface-2);font-style:italic;' : ''}${r.status === 'Paid' ? 'color:var(--text-secondary);' : ''}">
                 <td class="text-xs">${r.month}</td>
@@ -5343,6 +5394,7 @@ function openLoanSchedule(loanId) {
                 <td class="num text-xs">${r.emi ? fmt(r.emi) : '—'}</td>
                 <td class="num text-xs">${r.interest ? fmt(r.interest) : '—'}</td>
                 <td class="num text-xs">${r.principal ? fmt(r.principal) : '—'}</td>
+                ${showGst ? `<td class="num text-xs" style="color:#7c3aed;">${r.gst ? fmt(r.gst) : '—'}</td><td class="num text-xs fw-600" style="color:#7c3aed;">${r.totalPayment ? fmt(r.totalPayment) : '—'}</td>` : ''}
                 <td class="num text-xs fw-600">${fmt(r.closingBalance)}</td>
                 <td class="text-xs"><span class="badge ${r.status === 'Paid' ? 'badge-success' : r.status === 'Foreclosed' ? 'badge-warning' : r.eventType === 'Prepayment' ? 'badge-info' : r.eventType ? 'badge-primary' : ''}">${r.status}</span></td>
               </tr>`).join('')}
@@ -11748,7 +11800,7 @@ function mv2DetailConfig(type, id) {
       fullPage: 'loans',
       quickActions: [
         { key: 'loan-emi', icon: 'cash', label: 'Pay EMI', primary: true },
-        { key: 'loan-prepay', icon: 'fast-forward', label: 'Prepay' },
+        { key: 'loan-schedule', icon: 'table', label: 'Schedule' },
         { key: 'loan-edit', icon: 'edit', label: 'Edit' }
       ]
     };
@@ -11867,6 +11919,9 @@ function mv2QAct(action, id) {
         openTxnModal(null, { type: 'expense', category: 'EMI', payee: l?.lender || l?.name || '', note: 'Prepayment: ' + (l?.name || '') });
         break;
       }
+      case 'loan-schedule':
+        if (typeof openLoanSchedule === 'function') openLoanSchedule(id);
+        break;
       case 'loan-edit':
         if (typeof openLoanModal === 'function') openLoanModal(id); break;
       case 'inv-buy': {
