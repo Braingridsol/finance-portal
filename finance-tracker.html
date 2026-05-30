@@ -1853,6 +1853,150 @@ body.mv2 button { -webkit-tap-highlight-color: transparent; }
 .mv2-qa-tile.primary.t-insure { background: #d97706; }
 
 /* ========================================================================
+   Mobile-native Transactions page
+======================================================================== */
+.mv2-txn-search {
+  margin: 0 14px 10px;
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 12px; padding: 0 12px;
+  height: 42px;
+}
+[data-theme="dark"] .mv2-txn-search { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-txn-search [data-lucide] { width: 16px; height: 16px; color: #6b7280; flex-shrink: 0; }
+.mv2-txn-search input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 14px; color: inherit; min-width: 0;
+  font-family: inherit;
+}
+.mv2-txn-day-lbl {
+  font-size: 10px; font-weight: 700; color: #6b7280;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin: 12px 2px 8px;
+  display: flex; justify-content: space-between;
+}
+[data-theme="dark"] .mv2-txn-day-lbl { color: #9ca3af; }
+.mv2-txn-day-lbl span.cnt { color: #9ca3af; font-weight: 600; }
+.mv2-txn-group {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; overflow: hidden;
+  margin-bottom: 10px;
+}
+[data-theme="dark"] .mv2-txn-group { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-txn-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 13px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  background: none; border-left: none; border-right: none; border-top: none;
+  width: 100%; text-align: left;
+  color: inherit;
+}
+[data-theme="dark"] .mv2-txn-row { border-bottom-color: #2c2c2e; }
+.mv2-txn-row:last-child { border-bottom: none; }
+.mv2-txn-row.draft { background: #fef3c7; }
+[data-theme="dark"] .mv2-txn-row.draft { background: #422006; }
+.mv2-txn-row .draft-badge {
+  background: #d97706; color: #fff;
+  font-size: 8px; padding: 1px 5px; border-radius: 5px;
+  margin-left: 4px; font-weight: 700; text-transform: uppercase;
+}
+.mv2-settle-btn {
+  background: #10b981; color: #fff;
+  border: none; padding: 6px 10px;
+  border-radius: 8px; font-size: 11px; font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  flex-shrink: 0;
+}
+.mv2-settle-btn [data-lucide] { width: 12px; height: 12px; }
+.mv2-month-summary {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 12px;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .mv2-month-summary { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-month-summary-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.mv2-month-summary-title { font-size: 11px; color: #6b7280; font-weight: 600; }
+.mv2-month-summary-hint { font-size: 9px; color: #9ca3af; }
+.mv2-month-summary-chips {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+}
+.mv2-msc {
+  border-radius: 10px;
+  padding: 8px;
+}
+.mv2-msc-lbl { font-size: 9px; font-weight: 700; }
+.mv2-msc-val { font-size: 13px; font-weight: 700; margin-top: 2px; }
+.mv2-msc.inc { background: #d1fae5; color: #065f46; }
+.mv2-msc.exp { background: #fee2e2; color: #991b1b; }
+.mv2-msc.net { background: #ede9fe; color: #5b21b6; }
+[data-theme="dark"] .mv2-msc.inc { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .mv2-msc.exp { background: #7f1d1d; color: #fca5a5; }
+[data-theme="dark"] .mv2-msc.net { background: #4c1d95; color: #c4b5fd; }
+
+/* ========================================================================
+   Mobile-native Recurring page
+======================================================================== */
+.mv2-rec-sum {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 13px;
+  margin-bottom: 12px;
+}
+[data-theme="dark"] .mv2-rec-sum { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-rec-bar {
+  height: 5px; background: #f3f4f6; border-radius: 3px;
+  overflow: hidden; display: flex; margin-top: 4px;
+}
+[data-theme="dark"] .mv2-rec-bar { background: #2c2c2e; }
+.mv2-rec-bar-inc { background: #10b981; height: 100%; }
+.mv2-rec-bar-exp { background: #ef4444; height: 100%; }
+.mv2-rec-bar-tr { background: #3b82f6; height: 100%; }
+.mv2-rec-legend {
+  display: flex; justify-content: space-between;
+  margin-top: 6px; font-size: 9px; color: #6b7280;
+  gap: 4px; flex-wrap: wrap;
+}
+[data-theme="dark"] .mv2-rec-legend { color: #9ca3af; }
+.mv2-rec-legend .dot {
+  display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; margin-right: 3px; vertical-align: 1px;
+}
+
+.mv2-rec-card {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+[data-theme="dark"] .mv2-rec-card { background: #1c1c1e; border-color: #2c2c2e; }
+.mv2-rec-card.paused { opacity: 0.6; }
+.mv2-rec-card-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.mv2-rec-card-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 8px; border-top: 1px solid #f3f4f6;
+}
+[data-theme="dark"] .mv2-rec-card-meta { border-top-color: #2c2c2e; }
+.mv2-rec-card-meta .nextdue {
+  font-size: 10px; color: #6b7280;
+  flex: 1; min-width: 0;
+}
+[data-theme="dark"] .mv2-rec-card-meta .nextdue { color: #9ca3af; }
+.mv2-rec-card-meta .nextdue [data-lucide] { width: 11px; height: 11px; vertical-align: -1px; margin-right: 2px; }
+.mv2-rec-badge {
+  font-size: 9px; font-weight: 700;
+  padding: 3px 8px; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.mv2-rec-badge.active { background: #d1fae5; color: #065f46; }
+.mv2-rec-badge.paused { background: #f3f4f6; color: #6b7280; }
+[data-theme="dark"] .mv2-rec-badge.active { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .mv2-rec-badge.paused { background: #2c2c2e; color: #9ca3af; }
+
+/* ========================================================================
    MOBILE V2 MODAL — Make the existing modal look professional & spacious
 ======================================================================== */
 body.mv2 .modal-backdrop { z-index: 240 !important; align-items: flex-end; padding: 0; }
@@ -2678,8 +2822,27 @@ document.getElementById('fab').addEventListener('click', () => {
    9. RECURRING AUTO-DRAFT ENGINE
 ============================================================ */
 async function generateRecurringDrafts() {
+  // Local YYYY-MM-DD (avoids UTC off-by-one in IST/other +offset zones)
+  const localDateStr = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   let created = 0;
+  let dedupedCount = 0;
   for (const r of state.recurring.filter(x => x.active !== false && x.autoCreateDrafts !== false)) {
+    // DEFENSIVE DEDUPE: collapse any existing same-template same-date drafts to one
+    // (handles cases where previous bugged generations / sync races left duplicates)
+    const seenByDate = new Map();
+    const dupeIds = [];
+    for (const t of state.transactions) {
+      if (t.recurringId !== r.id || t.status !== 'Draft') continue;
+      const key = t.date;
+      if (seenByDate.has(key)) dupeIds.push(t.id);
+      else seenByDate.set(key, t.id);
+    }
+    if (dupeIds.length > 0) {
+      // Remove from state first (instant), then parallel cloud deletes
+      state.transactions = state.transactions.filter(x => !dupeIds.includes(x.id));
+      await Promise.all(dupeIds.map(did => dbDel('transactions', did).catch(e => console.warn('dedupe dbDel failed', e))));
+      dedupedCount += dupeIds.length;
+    }
     const horizon = (r.draftAdvanceMonths || 3) * 31;
     const start = todayDate();
     const end = new Date(start); end.setDate(end.getDate() + horizon);
@@ -2693,30 +2856,31 @@ async function generateRecurringDrafts() {
         const lastOfMonth = new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate();
         const day = Math.min(r.dayOfMonth || 1, lastOfMonth);
         const fire = new Date(cur.getFullYear(), cur.getMonth(), day);
-        if (fire >= start && fire <= limit) dates.push(fire.toISOString().slice(0,10));
+        if (fire >= start && fire <= limit) dates.push(localDateStr(fire));
         cur.setMonth(cur.getMonth() + 1);
       }
     } else if (r.frequency === 'yearly') {
       let cur = new Date(rStart);
       while (cur <= limit) {
         const fire = new Date(cur.getFullYear(), (r.month || 1) - 1, r.dayOfMonth || 1);
-        if (fire >= start && fire <= limit) dates.push(fire.toISOString().slice(0,10));
+        if (fire >= start && fire <= limit) dates.push(localDateStr(fire));
         cur.setFullYear(cur.getFullYear() + 1);
       }
     } else if (r.frequency === 'quarterly') {
       let cur = new Date(rStart);
       while (cur <= limit) {
-        dates.push(cur.toISOString().slice(0,10));
+        dates.push(localDateStr(cur));
         cur.setMonth(cur.getMonth() + 3);
       }
     } else if (r.frequency === 'weekly') {
       let cur = new Date(rStart);
       while (cur <= limit) {
-        dates.push(cur.toISOString().slice(0,10));
+        dates.push(localDateStr(cur));
         cur.setDate(cur.getDate() + 7);
       }
     }
-    // Create drafts for each date that doesn't yet have one
+    // Build all new draft objects first (sync, fast), then write to cloud in parallel
+    const newDrafts = [];
     for (const d of dates) {
       const exists = state.transactions.some(t => t.recurringId === r.id && t.date === d);
       if (exists) continue;
@@ -2742,10 +2906,17 @@ async function generateRecurringDrafts() {
         draftCreatedAt: nowISO(),
         settledAt: null
       };
-      await dbPut('transactions', draft);
-      state.transactions.push(draft);
+      newDrafts.push(draft);
+      state.transactions.push(draft); // optimistic — state updated immediately
       created++;
     }
+    if (newDrafts.length) {
+      // Parallelize cloud writes — 10 in flight is much faster than 10 sequential
+      await Promise.all(newDrafts.map(draft => dbPut('transactions', draft).catch(e => console.warn('draft write failed', e))));
+    }
+  }
+  if (dedupedCount > 0) {
+    console.log(`generateRecurringDrafts: removed ${dedupedCount} duplicate draft(s)`);
   }
   return created;
 }
@@ -3648,24 +3819,29 @@ async function saveRecurring(id) {
   };
   const before = id ? state.recurring.find(x => x.id === id) : null;
   await dbPut('recurring', obj);
+  let regeneratedCount = 0;
   if (id) {
     const i = state.recurring.findIndex(x => x.id === id);
     state.recurring[i] = obj;
-    // Update existing future drafts from this template
+    // RESET: delete every future Draft tied to this template, then regenerate.
+    // Parallelized so 10+ drafts don't take 6 seconds of sequential cloud calls.
     const futureDrafts = state.transactions.filter(t => t.recurringId === id && t.status === 'Draft' && t.date >= today());
-    for (const d of futureDrafts) {
-      const dBefore = { ...d };
-      d.amount = obj.amount; d.category = obj.category;
-      d.fromAccountId = obj.fromAccountId; d.toAccountId = obj.toAccountId; d.cardId = obj.cardId;
-      d.payee = obj.label; d.type = obj.type;
-      await dbPut('transactions', d);
-      await audit('update','transaction',d.id,dBefore,d,'Updated from recurring template');
-    }
+    regeneratedCount = futureDrafts.length;
+    // Remove from local state first (synchronous, instant)
+    state.transactions = state.transactions.filter(t => !(t.recurringId === id && t.status === 'Draft' && t.date >= today()));
+    // Fire all cloud deletes in parallel; skip per-draft audit log (too noisy + slow)
+    await Promise.all(futureDrafts.map(d => dbDel('transactions', d.id).catch(e => console.warn('delete draft failed', e))));
   } else state.recurring.push(obj);
-  await audit(id ? 'update' : 'create', 'recurring', obj.id, before, obj);
-  // Generate fresh drafts
-  await generateRecurringDrafts();
-  closeModal(); toast('Saved — drafts updated','success'); renderCurrent();
+  // Single summary audit (instead of per-draft)
+  audit(id ? 'update' : 'create', 'recurring', obj.id, before, obj).catch(()=>{});
+  // Generate fresh drafts (now parallelized inside generateRecurringDrafts)
+  const created = await generateRecurringDrafts();
+  closeModal();
+  const msg = id
+    ? `Template saved — ${regeneratedCount} draft${regeneratedCount===1?'':'s'} cleared, ${created} regenerated`
+    : `Template saved — ${created} draft${created===1?'':'s'} created`;
+  toast(msg, 'success');
+  renderCurrent();
 }
 
 async function toggleRecurring(id) {
@@ -3704,7 +3880,13 @@ async function deleteRecurring(id) {
    PROJECTION MODULE
 ============================================================ */
 function renderProjection() {
-  const horizon = state.settings.projectionDays || 60;
+  // Auto-expand the default horizon if any active recurring template plans
+  // further ahead than the user's setting (so a 10-month template isn't truncated)
+  const settingDays = state.settings.projectionDays || 60;
+  const maxTemplateDays = state.recurring
+    .filter(r => r.active !== false && r.autoCreateDrafts !== false)
+    .reduce((m, r) => Math.max(m, (r.draftAdvanceMonths || 3) * 31), 0);
+  const horizon = Math.max(settingDays, maxTemplateDays);
   const main = document.getElementById('main');
   const endDate = addDays(today(), horizon);
   // Reads from Draft transactions in next horizon days
@@ -3746,8 +3928,9 @@ function renderProjection() {
       <div><div class="page-title">Projection</div>
         <div class="page-sub">${horizon}-day cash flow forecast · ${projected.length} planned items${lowCount ? ` · <span class="text-danger">${lowCount} low-balance warning${lowCount===1?'':'s'}</span>` : ''}</div></div>
       <div class="row">
-        <select id="projDays" style="max-width:160px;" onchange="changeProjectionHorizon()">
-          ${[30,60,90,180,365].map(d => `<option value="${d}" ${horizon === d ? 'selected' : ''}>Next ${d} days</option>`).join('')}
+        <select id="projDays" style="max-width:180px;" onchange="changeProjectionHorizon()">
+          ${[30,60,90,180,365,730].map(d => `<option value="${d}" ${horizon === d ? 'selected' : ''}>Next ${d >= 365 ? Math.round(d/30) + ' months' : d + ' days'}</option>`).join('')}
+          ${![30,60,90,180,365,730].includes(horizon) ? `<option value="${horizon}" selected>Auto · next ${horizon} days</option>` : ''}
         </select>
         <button class="btn btn-secondary" onclick="navigate('recurring')"><i data-lucide="settings-2"></i>Templates</button>
       </div>
@@ -10480,6 +10663,27 @@ function mv2RenderHeader() {
   let alertCount = 0;
   try { if (typeof computeAlerts === 'function') alertCount = computeAlerts().length; } catch(e){}
 
+  // Subpage header (back arrow + title + optional action)
+  if (mv2State.subPage) {
+    const titles = { recurring: 'Recurring templates', transactions: 'Transactions' };
+    let actionBtns = '';
+    if (mv2State.subPage === 'recurring') {
+      actionBtns = `<button class="mv2-iconbtn" onclick="if(typeof openRecurringModal==='function')openRecurringModal()"><i data-lucide="plus"></i></button>`;
+    } else if (mv2State.subPage === 'transactions') {
+      const hasFilters = (mv2State.txnFilter && mv2State.txnFilter !== 'all') || mv2State.txnSearch;
+      actionBtns = `
+        <button class="mv2-iconbtn" onclick="mv2ToggleTxnSearch()"><i data-lucide="search"></i></button>
+        <button class="mv2-iconbtn" onclick="mv2OpenTxnFilters()" style="position:relative;"><i data-lucide="sliders-horizontal"></i>${hasFilters ? '<span class="badge-dot" style="background:#4f46e5;"></span>' : ''}</button>`;
+    }
+    h.innerHTML = `
+      <div class="mv2-header">
+        <button class="mv2-fp-back" onclick="mv2CloseSubpage()" aria-label="Back"><i data-lucide="arrow-left"></i></button>
+        <div class="mv2-greeting" style="text-align:left;"><div class="mv2-greeting-name" style="font-size:17px;">${titles[mv2State.subPage] || mv2State.subPage}</div></div>
+        ${actionBtns}
+      </div>`;
+    return;
+  }
+
   if (mv2State.tab === 'home') {
     h.innerHTML = `
       <div class="mv2-header">
@@ -10520,6 +10724,7 @@ function mv2GoTab(tab) {
   const nextIdx = MV2_TAB_ORDER[tab] ?? 0;
   const dir = nextIdx >= prevIdx ? 'slide-right' : 'slide-left';
   mv2State.tab = tab; mv2State.lastTab = tab;
+  mv2State.subPage = null;
   mv2Render();
   const b = document.getElementById('mv2Body');
   if (b) {
@@ -10792,6 +10997,9 @@ function mv2NewProfilePrompt() {
 
 function mv2RenderBody() {
   const body = document.getElementById('mv2Body'); if (!body) return;
+  // Subpage takes priority over tab
+  if (mv2State.subPage === 'recurring') { mv2RecurringPage(body); return; }
+  if (mv2State.subPage === 'transactions') { mv2TransactionsPage(body); return; }
   const renderers = { home: mv2Home, money: mv2Money, reports: mv2Reports, more: mv2More };
   (renderers[mv2State.tab] || mv2Home)(body);
 }
@@ -11577,8 +11785,554 @@ function mv2More(body) {
   `;
 }
 
+/* ====== Mobile-native Recurring page ====== */
+function mv2RecurringPage(body) {
+  const all = (state.recurring || []);
+  const filter = mv2State.subPageFilter || 'all';
+  // Per-frequency monthly equivalent for total
+  const monthlyEq = r => {
+    const freq = r.frequency;
+    const amt = +r.amount || 0;
+    if (freq === 'monthly') return amt;
+    if (freq === 'yearly') return amt / 12;
+    if (freq === 'quarterly') return amt / 3;
+    if (freq === 'weekly') return amt * 4.33;
+    return amt;
+  };
+  const activeTpl = all.filter(r => r.active !== false);
+  const incTotal = activeTpl.filter(r => r.type === 'income').reduce((s,r) => s + monthlyEq(r), 0);
+  const expTotal = activeTpl.filter(r => r.type === 'expense' || r.type === 'settlement').reduce((s,r) => s + monthlyEq(r), 0);
+  const trTotal = activeTpl.filter(r => r.type === 'transfer').reduce((s,r) => s + monthlyEq(r), 0);
+  const net = incTotal - expTotal;
+  // Bar widths
+  const total = incTotal + expTotal + trTotal || 1;
+  const incPct = (incTotal / total) * 100;
+  const expPct = (expTotal / total) * 100;
+  const trPct = 100 - incPct - expPct;
+  // Filter list
+  let list = all.slice();
+  if (filter === 'income') list = list.filter(r => r.type === 'income');
+  else if (filter === 'expense') list = list.filter(r => r.type === 'expense' || r.type === 'settlement');
+  else if (filter === 'paused') list = list.filter(r => r.active === false);
+  // Sort by next due date (active first)
+  list.sort((a,b) => {
+    if ((a.active === false) !== (b.active === false)) return a.active === false ? 1 : -1;
+    const aNext = mv2RecNextDue(a); const bNext = mv2RecNextDue(b);
+    return (aNext || '9999').localeCompare(bNext || '9999');
+  });
+
+  body.innerHTML = `
+    <div class="mv2-rec-sum">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
+        <div><div style="font-size:10px;color:#6b7280;">Net monthly recurring</div><div style="font-size:20px;font-weight:700;color:${net>=0?'#10b981':'#ef4444'};">${net>=0?'+':'−'}${fmt(Math.abs(net))}</div></div>
+        <div style="text-align:right;"><div style="font-size:10px;color:#6b7280;">Active</div><div style="font-size:14px;font-weight:700;">${activeTpl.length}/${all.length}</div></div>
+      </div>
+      <div class="mv2-rec-bar">
+        <div class="mv2-rec-bar-inc" style="width:${incPct.toFixed(1)}%"></div>
+        <div class="mv2-rec-bar-exp" style="width:${expPct.toFixed(1)}%"></div>
+        <div class="mv2-rec-bar-tr" style="width:${trPct.toFixed(1)}%"></div>
+      </div>
+      <div class="mv2-rec-legend">
+        <span><span class="dot" style="background:#10b981;"></span>${fmt(incTotal)} in</span>
+        <span><span class="dot" style="background:#ef4444;"></span>${fmt(expTotal)} out</span>
+        ${trTotal > 0 ? `<span><span class="dot" style="background:#3b82f6;"></span>${fmt(trTotal)} transfer</span>` : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:4px;scrollbar-width:none;">
+      ${[['all','All',all.length],['income','Income',all.filter(r=>r.type==='income').length],['expense','Expense',all.filter(r=>r.type==='expense'||r.type==='settlement').length],['paused','Paused',all.filter(r=>r.active===false).length]].map(([id,lbl,n]) =>
+        `<button class="mv2-pill ${filter===id?'active':''}" onclick="mv2SetRecFilter('${id}')">${lbl}${n>0?' · '+n:''}</button>`).join('')}
+    </div>
+    ${list.length === 0 ? `
+      <div class="mv2-empty t-acct" style="margin-top:8px;">
+        <div class="mv2-empty-ic"><i data-lucide="repeat"></i></div>
+        <div class="mv2-empty-t">${all.length === 0 ? 'No recurring templates' : 'No templates in this filter'}</div>
+        <div class="mv2-empty-m">${all.length === 0 ? 'Set up templates for rent, salary, EMIs, subscriptions — they auto-create future drafts.' : 'Try a different filter or add a new template.'}</div>
+      </div>
+      ${all.length === 0 ? `<button class="mv2-solid-btn t-acct" onclick="if(typeof openRecurringModal==='function')openRecurringModal()"><i data-lucide="plus"></i>Add template</button>` : ''}
+    ` : list.map(mv2RecCard).join('') + `<button class="mv2-add-tile t-acct" onclick="if(typeof openRecurringModal==='function')openRecurringModal()"><i data-lucide="plus"></i>Add recurring template</button>`}
+    <div style="height:24px;"></div>
+  `;
+  if (window.lucide) lucide.createIcons();
+}
+
+function mv2SetRecFilter(f) {
+  mv2State.subPageFilter = f;
+  mv2RecurringPage(document.getElementById('mv2Body'));
+}
+
+function mv2RecNextDue(r) {
+  const drafts = (state.transactions || []).filter(t => t.recurringId === r.id && t.status === 'Draft' && t.date >= today());
+  if (!drafts.length) return null;
+  drafts.sort((a,b) => a.date.localeCompare(b.date));
+  return drafts[0].date;
+}
+
+function mv2RecCard(r) {
+  const tint = r.type === 'income' ? { bg:'#d1fae5', fg:'#059669' } : r.type === 'transfer' ? { bg:'#dbeafe', fg:'#2563eb' } : r.type === 'settlement' ? { bg:'#ede9fe', fg:'#7c3aed' } : { bg:'#fee2e2', fg:'#dc2626' };
+  const cat = (state.categories || []).find(c => c.name === r.category);
+  const icon = cat?.icon || (r.type === 'income' ? 'briefcase' : r.type === 'transfer' ? 'arrow-left-right' : 'shopping-bag');
+  const amtSign = r.type === 'income' ? '+' : '−';
+  const amtColor = r.type === 'income' ? '#10b981' : '#111';
+  const next = mv2RecNextDue(r);
+  const daysToNext = next ? Math.ceil((new Date(next) - new Date(today())) / 86400000) : null;
+  const isPaused = r.active === false;
+  const acctFrom = (state.accounts || []).find(a => a.id === r.fromAccountId);
+  const acctTo = (state.accounts || []).find(a => a.id === r.toAccountId);
+  const card = (state.cards || []).find(c => c.id === r.cardId);
+  const tail = r.type === 'income' ? (acctTo ? '→ ' + (acctTo.bank || acctTo.name) : '') : (card ? '→ ' + (card.issuer || card.name) : (acctFrom ? (acctFrom.bank || acctFrom.name) : ''));
+  const draftCount = (state.transactions || []).filter(t => t.recurringId === r.id && t.status === 'Draft').length;
+  return `
+    <div class="mv2-rec-card ${isPaused ? 'paused' : ''}" onclick="mv2OpenRecDetailSheet('${r.id}')">
+      <div class="mv2-rec-card-row">
+        <div style="width:36px;height:36px;border-radius:10px;background:${tint.bg};color:${tint.fg};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="${icon}" style="width:17px;height:17px;"></i></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:#111;">${escapeHTML(r.label)}</div>
+          <div style="font-size:10px;color:#6b7280;">${r.frequency} · ${r.dayOfMonth ? 'day '+r.dayOfMonth : ''}${tail ? ' · ' + escapeHTML(tail) : ''}</div>
+        </div>
+        <div style="text-align:right;"><div style="font-size:14px;font-weight:700;color:${amtColor};">${amtSign}${fmt(r.amount)}</div></div>
+      </div>
+      <div class="mv2-rec-card-meta">
+        <div class="nextdue">
+          ${isPaused ? '<i data-lucide="pause-circle"></i>Paused' : (next ? `<i data-lucide="clock"></i>Next: ${mv2RelDate(next)}${draftCount>0?' · '+draftCount+' draft'+(draftCount===1?'':'s'):''}` : '<i data-lucide="alert-circle"></i>No upcoming drafts')}
+        </div>
+        <span class="mv2-rec-badge ${isPaused ? 'paused' : 'active'}">${isPaused ? 'PAUSED' : 'ACTIVE'}</span>
+      </div>
+    </div>
+  `;
+}
+
+/* Detail bottom sheet for a recurring template */
+function mv2OpenRecDetailSheet(id) {
+  if (!document.getElementById('mv2DetailSheet')) {
+    const bd = document.createElement('div');
+    bd.id = 'mv2DetailBackdrop';
+    bd.className = 'mv2-sheet-backdrop';
+    bd.onclick = mv2CloseDetailSheet;
+    document.body.appendChild(bd);
+    const sh = document.createElement('div');
+    sh.id = 'mv2DetailSheet';
+    sh.className = 'mv2-sheet';
+    document.body.appendChild(sh);
+  }
+  mv2RenderRecDetailSheet(id);
+  requestAnimationFrame(() => {
+    document.getElementById('mv2DetailBackdrop').classList.add('open');
+    document.getElementById('mv2DetailSheet').classList.add('open');
+  });
+}
+
+function mv2RenderRecDetailSheet(id) {
+  const sheet = document.getElementById('mv2DetailSheet'); if (!sheet) return;
+  const r = (state.recurring || []).find(x => x.id === id);
+  if (!r) { sheet.innerHTML = '<div class="mv2-sheet-handle"></div><div style="padding:30px;text-align:center;color:#9ca3af;">Not found</div>'; return; }
+  const tint = r.type === 'income' ? { bg:'#d1fae5', fg:'#059669', dark:{ bg:'#064e3b', fg:'#6ee7b7' } } : r.type === 'transfer' ? { bg:'#dbeafe', fg:'#2563eb', dark:{ bg:'#1e3a8a', fg:'#93c5fd' } } : { bg:'#fee2e2', fg:'#dc2626', dark:{ bg:'#7f1d1d', fg:'#fca5a5' } };
+  const cat = (state.categories || []).find(c => c.name === r.category);
+  const icon = cat?.icon || (r.type === 'income' ? 'briefcase' : r.type === 'transfer' ? 'arrow-left-right' : 'shopping-bag');
+  const isPaused = r.active === false;
+  const next = mv2RecNextDue(r);
+  const daysToNext = next ? Math.ceil((new Date(next) - new Date(today())) / 86400000) : null;
+  const drafts = (state.transactions || []).filter(t => t.recurringId === r.id && t.status === 'Draft' && t.date >= today()).sort((a,b) => a.date.localeCompare(b.date));
+  const acctFrom = (state.accounts || []).find(a => a.id === r.fromAccountId);
+  const acctTo = (state.accounts || []).find(a => a.id === r.toAccountId);
+  const tail = r.type === 'income' ? (acctTo ? 'To ' + (acctTo.bank || acctTo.name) : '') : (acctFrom ? 'From ' + (acctFrom.bank || acctFrom.name) : '');
+  const sign = r.type === 'income' ? '+' : '−';
+  const amtColor = r.type === 'income' ? '#10b981' : '#ef4444';
+
+  sheet.innerHTML = `
+    <div class="mv2-sheet-handle"></div>
+    <div class="mv2-sheet-titlebar">
+      <div class="mv2-sheet-title">${escapeHTML(r.label)}</div>
+      <button class="mv2-sheet-close" onclick="mv2CloseDetailSheet()"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;padding:4px 0 16px;border-bottom:1px solid #f3f4f6;margin-bottom:14px;">
+      <div style="width:54px;height:54px;border-radius:14px;background:${tint.bg};color:${tint.fg};display:flex;align-items:center;justify-content:center;"><i data-lucide="${icon}" style="width:24px;height:24px;"></i></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;color:#6b7280;">${r.frequency}${r.dayOfMonth ? ' · day '+r.dayOfMonth : ''}</div>
+        <div style="font-size:22px;font-weight:700;color:${amtColor};">${sign}${fmt(r.amount)}</div>
+        ${tail ? `<div style="font-size:11px;color:#6b7280;">${escapeHTML(tail)}</div>` : ''}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+      <div style="background:#f7f5ef;border-radius:10px;padding:9px;">
+        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">Next due</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px;">${next ? mv2RelDate(next) : '—'}</div>
+        ${daysToNext !== null ? `<div style="font-size:9px;color:#6b7280;">in ${daysToNext} day${daysToNext===1?'':'s'}</div>` : ''}
+      </div>
+      <div style="background:#f7f5ef;border-radius:10px;padding:9px;">
+        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">Drafts</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px;">${drafts.length}</div>
+        <div style="font-size:9px;color:#6b7280;">ahead</div>
+      </div>
+      <div style="background:#f7f5ef;border-radius:10px;padding:9px;">
+        <div style="font-size:9px;color:#6b7280;text-transform:uppercase;">Category</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px;">${escapeHTML(r.category || '—')}</div>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Quick actions</div>
+    <div class="mv2-qa-row">
+      <button class="mv2-qa-tile primary t-acct" onclick="mv2CloseDetailSheet();setTimeout(()=>{if(typeof openRecurringModal==='function')openRecurringModal('${r.id}')},240)"><i data-lucide="edit"></i>Edit</button>
+      <button class="mv2-qa-tile" onclick="mv2RecTogglePause('${r.id}')"><i data-lucide="${isPaused?'play':'pause'}"></i>${isPaused?'Resume':'Pause'}</button>
+      <button class="mv2-qa-tile" style="color:#ef4444;" onclick="mv2RecDelete('${r.id}')"><i data-lucide="trash-2"></i>Delete</button>
+    </div>
+    ${drafts.length ? `
+      <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Upcoming drafts</div>
+      <div class="mv2-listcard" style="margin-bottom:14px;">
+        ${drafts.slice(0, 5).map(d => {
+          const days = Math.ceil((new Date(d.date) - new Date(today())) / 86400000);
+          return `<div class="mv2-li" style="cursor:default;display:flex;">
+            <i data-lucide="clock" style="width:14px;height:14px;color:#9ca3af;"></i>
+            <div class="mv2-li-main"><div class="mv2-li-t">${mv2RelDate(d.date)}</div><div class="mv2-li-s">${days} day${days===1?'':'s'} from now</div></div>
+            <div class="mv2-li-r"><div class="mv2-li-amt">${sign}${fmt(d.amount)}</div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    ` : ''}
+  `;
+  if (window.lucide) lucide.createIcons();
+}
+
+async function mv2RecTogglePause(id) {
+  mv2CloseDetailSheet();
+  if (typeof toggleRecurring === 'function') {
+    await toggleRecurring(id);
+    setTimeout(() => mv2Render(), 100);
+  }
+}
+async function mv2RecDelete(id) {
+  mv2CloseDetailSheet();
+  if (typeof deleteRecurring === 'function') {
+    await deleteRecurring(id);
+    setTimeout(() => mv2Render(), 100);
+  }
+}
+
+/* ====== Mobile-native Transactions page ====== */
+function mv2TransactionsPage(body) {
+  const filter = mv2State.txnFilter || 'all';
+  const search = (mv2State.txnSearch || '').trim().toLowerCase();
+  const showSearch = mv2State.txnShowSearch;
+  // Default to current LOCAL month if not set (avoids UTC off-by-one)
+  if (!mv2State.txnMonth) {
+    const n = new Date();
+    mv2State.txnMonth = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;
+  }
+  const monthK = mv2State.txnMonth;
+  // Filter by month + filter + search
+  let list = (state.transactions || []).filter(t => {
+    if (!t.date.startsWith(monthK)) return false;
+    if (filter === 'income' && t.type !== 'income') return false;
+    if (filter === 'expense' && t.type !== 'expense' && t.type !== 'settlement') return false;
+    if (filter === 'drafts' && t.status !== 'Draft') return false;
+    if (search) {
+      const hay = ((t.payee||'') + ' ' + (t.category||'') + ' ' + (t.note||'') + ' ' + (t.reference||'') + ' ' + (t.subcategory||'')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  }).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  // Counts per filter (within month + search)
+  const inMonth = (state.transactions || []).filter(t => {
+    if (!t.date.startsWith(monthK)) return false;
+    if (search) {
+      const hay = ((t.payee||'') + ' ' + (t.category||'') + ' ' + (t.note||'')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  const counts = {
+    all: inMonth.length,
+    income: inMonth.filter(t => t.type === 'income').length,
+    expense: inMonth.filter(t => t.type === 'expense' || t.type === 'settlement').length,
+    drafts: inMonth.filter(t => t.status === 'Draft').length
+  };
+  // Month summary numbers
+  const monthSettled = (state.transactions || []).filter(t => t.date.startsWith(monthK) && t.status !== 'Draft');
+  const income = monthSettled.filter(t => t.type === 'income').reduce((s,t) => s + +t.amount, 0);
+  const expense = monthSettled.filter(t => t.type === 'expense' || t.type === 'settlement').reduce((s,t) => s + +t.amount, 0);
+  const net = income - expense;
+  // Build label from monthK using local year/month constructor (avoid UTC midnight parse rollback)
+  const [mY, mM] = monthK.split('-').map(Number);
+  const monthLabel = new Date(mY, mM - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+  // Group by day
+  const groups = {};
+  list.forEach(t => { (groups[t.date] = groups[t.date] || []).push(t); });
+  const dayKeys = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+
+  body.innerHTML = `
+    ${showSearch ? `
+      <div class="mv2-txn-search">
+        <i data-lucide="search"></i>
+        <input id="mv2TxnSearchInput" placeholder="Search payee, category, note…" value="${escapeHTML(mv2State.txnSearch||'')}" oninput="mv2State.txnSearch = this.value; clearTimeout(window.__mv2TxnST); window.__mv2TxnST = setTimeout(() => mv2TransactionsPage(document.getElementById('mv2Body')), 200);" />
+        ${search ? `<button onclick="mv2State.txnSearch=''; mv2TransactionsPage(document.getElementById('mv2Body'));" style="background:none;border:none;color:#9ca3af;cursor:pointer;padding:4px;"><i data-lucide="x" style="width:14px;height:14px;"></i></button>` : ''}
+      </div>
+    ` : ''}
+    <div style="padding:0 14px 8px;">
+      <div class="mv2-month-summary" onclick="mv2OpenMonthPicker()">
+        <div class="mv2-month-summary-head">
+          <div class="mv2-month-summary-title">${escapeHTML(monthLabel)} · ${counts.all} entr${counts.all===1?'y':'ies'}</div>
+          <div class="mv2-month-summary-hint">Tap to change ▾</div>
+        </div>
+        <div class="mv2-month-summary-chips">
+          <div class="mv2-msc inc"><div class="mv2-msc-lbl">IN</div><div class="mv2-msc-val">${fmt(income)}</div></div>
+          <div class="mv2-msc exp"><div class="mv2-msc-lbl">OUT</div><div class="mv2-msc-val">${fmt(expense)}</div></div>
+          <div class="mv2-msc net"><div class="mv2-msc-lbl">NET</div><div class="mv2-msc-val">${net>=0?'+':'−'}${fmt(Math.abs(net))}</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:6px 14px 10px; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none;">
+      ${[['all','All',counts.all],['income','Income',counts.income],['expense','Expense',counts.expense],['drafts','Drafts',counts.drafts]].map(([id,lbl,n]) =>
+        `<button class="mv2-pill ${filter===id?'active':''}" onclick="mv2SetTxnFilter('${id}')">${lbl}${n>0?' · '+n:''}</button>`).join('')}
+    </div>
+    <div style="padding:0 14px;">
+      ${dayKeys.length === 0 ? `
+        <div class="mv2-empty t-acct" style="margin-top:8px;">
+          <div class="mv2-empty-ic"><i data-lucide="receipt"></i></div>
+          <div class="mv2-empty-t">No transactions${search?' matching "'+escapeHTML(search)+'"':''}</div>
+          <div class="mv2-empty-m">${counts.all === 0 ? 'Tap the + button below to add your first one for ' + escapeHTML(monthLabel) + '.' : 'Try a different filter or pick another month.'}</div>
+        </div>
+      ` : dayKeys.map(dk => `
+        <div class="mv2-txn-day-lbl"><span>${mv2RelDate(dk)} · ${new Date(dk).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</span><span class="cnt">${groups[dk].length}</span></div>
+        <div class="mv2-txn-group">
+          ${groups[dk].map(mv2TxnPageRow).join('')}
+        </div>
+      `).join('')}
+      <div style="height:80px;"></div>
+    </div>
+  `;
+  if (window.lucide) lucide.createIcons();
+  if (showSearch) setTimeout(() => document.getElementById('mv2TxnSearchInput')?.focus(), 50);
+}
+
+function mv2TxnPageRow(t) {
+  const isInc = t.type === 'income';
+  const isTr = t.type === 'transfer';
+  const isSet = t.type === 'settlement';
+  const isDraft = t.status === 'Draft';
+  const cat = (state.categories || []).find(c => c.name === t.category);
+  const catName = t.category || (isTr ? 'Transfer' : isSet ? 'Card payment' : 'Other');
+  const icon = isInc ? 'briefcase' : isTr ? 'arrow-left-right' : isSet ? 'credit-card' : (cat?.icon || 'shopping-bag');
+  const icCls = isInc ? 'mv2-ic-green' : isTr ? 'mv2-ic-blue' : isSet ? 'mv2-ic-purple' : 'mv2-ic-red';
+  const sign = isInc ? '+' : (isTr ? '' : '−');
+  const amtClass = isInc ? 'gain' : '';
+  // Account label (for subtitle)
+  const acct = (state.accounts || []).find(a => a.id === (isInc ? t.toAccountId : t.fromAccountId));
+  const card = (state.cards || []).find(c => c.id === t.cardId);
+  const acctLbl = card ? (card.issuer || card.name) : (acct ? (acct.bank || acct.name) : '');
+  const isPastDue = isDraft && t.date < today();
+  return `
+    <button class="mv2-txn-row ${isDraft ? 'draft' : ''}" onclick="mv2OpenTxnDetail('${t.id}')">
+      <div class="mv2-li-ic ${icCls}"><i data-lucide="${icon}"></i></div>
+      <div class="mv2-li-main">
+        <div class="mv2-li-t">${escapeHTML(t.payee || catName)}${isDraft ? '<span class="draft-badge">DRAFT</span>' : ''}</div>
+        <div class="mv2-li-s">${escapeHTML(catName)}${acctLbl ? ' · ' + escapeHTML(acctLbl) : ''}${t.note ? ' · ' + escapeHTML(t.note.slice(0,30)) : ''}</div>
+      </div>
+      ${isDraft && isPastDue ? `
+        <button class="mv2-settle-btn" onclick="event.stopPropagation();mv2SettleDraftRow('${t.id}')"><i data-lucide="check"></i>Settle</button>
+      ` : `
+        <div class="mv2-li-r"><div class="mv2-li-amt ${amtClass}">${sign}${fmt(t.amount)}</div></div>
+      `}
+    </button>
+  `;
+}
+
+function mv2SetTxnFilter(f) {
+  mv2State.txnFilter = f;
+  mv2TransactionsPage(document.getElementById('mv2Body'));
+}
+
+function mv2ToggleTxnSearch() {
+  mv2State.txnShowSearch = !mv2State.txnShowSearch;
+  if (!mv2State.txnShowSearch) mv2State.txnSearch = '';
+  mv2TransactionsPage(document.getElementById('mv2Body'));
+}
+
+function mv2OpenMonthPicker() {
+  // Build last 24 months using LOCAL date formatting (UTC conversion shifts month in IST)
+  const localMonthKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  const opts = [];
+  const now = new Date();
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    opts.push({ key: localMonthKey(d), lbl: d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) });
+  }
+  let html = '<div style="display:flex;flex-direction:column;gap:4px;margin:-8px 0;">';
+  opts.forEach(o => {
+    const active = o.key === mv2State.txnMonth;
+    html += `<button onclick="mv2State.txnMonth='${o.key}';closeModal();mv2TransactionsPage(document.getElementById('mv2Body'));" style="background:${active?'#4f46e5':'transparent'};color:${active?'#fff':'inherit'};border:none;padding:13px;text-align:left;border-radius:10px;font-size:14px;font-weight:${active?'700':'500'};cursor:pointer;">${o.lbl}</button>`;
+  });
+  html += '</div>';
+  if (typeof openModal === 'function') openModal('Choose month', html);
+}
+
+function mv2OpenTxnFilters() {
+  let html = `
+    <div style="margin:-8px 0;">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Type</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          ${[['all','All'],['income','Income only'],['expense','Expense only'],['drafts','Drafts only']].map(([id,lbl]) => {
+            const a = (mv2State.txnFilter || 'all') === id;
+            return `<button onclick="mv2SetTxnFilter('${id}');closeModal();" style="background:${a?'#4f46e5':'#f3f4f6'};color:${a?'#fff':'#111'};border:none;padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">${lbl}</button>`;
+          }).join('')}
+        </div>
+      </div>
+      <button onclick="mv2State.txnFilter='all';mv2State.txnSearch='';mv2State.txnShowSearch=false;closeModal();mv2TransactionsPage(document.getElementById('mv2Body'));" style="width:100%;background:transparent;border:1px solid #e5e7eb;color:#4f46e5;padding:11px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">Clear all filters</button>
+    </div>
+  `;
+  if (typeof openModal === 'function') openModal('Filters', html);
+}
+
+/* Transaction detail bottom sheet */
+function mv2OpenTxnDetail(id) {
+  if (!document.getElementById('mv2DetailSheet')) {
+    const bd = document.createElement('div');
+    bd.id = 'mv2DetailBackdrop';
+    bd.className = 'mv2-sheet-backdrop';
+    bd.onclick = mv2CloseDetailSheet;
+    document.body.appendChild(bd);
+    const sh = document.createElement('div');
+    sh.id = 'mv2DetailSheet';
+    sh.className = 'mv2-sheet';
+    document.body.appendChild(sh);
+  }
+  mv2RenderTxnDetailSheet(id);
+  requestAnimationFrame(() => {
+    document.getElementById('mv2DetailBackdrop').classList.add('open');
+    document.getElementById('mv2DetailSheet').classList.add('open');
+  });
+}
+
+function mv2RenderTxnDetailSheet(id) {
+  const sheet = document.getElementById('mv2DetailSheet'); if (!sheet) return;
+  const t = (state.transactions || []).find(x => x.id === id);
+  if (!t) { sheet.innerHTML = '<div class="mv2-sheet-handle"></div><div style="padding:30px;text-align:center;color:#9ca3af;">Not found</div>'; return; }
+  const isInc = t.type === 'income';
+  const isTr = t.type === 'transfer';
+  const isSet = t.type === 'settlement';
+  const isDraft = t.status === 'Draft';
+  const cat = (state.categories || []).find(c => c.name === t.category);
+  const catName = t.category || (isTr ? 'Transfer' : isSet ? 'Card payment' : 'Other');
+  const icon = isInc ? 'briefcase' : isTr ? 'arrow-left-right' : isSet ? 'credit-card' : (cat?.icon || 'shopping-bag');
+  const tint = isInc ? { bg:'#d1fae5', fg:'#059669' } : isTr ? { bg:'#dbeafe', fg:'#2563eb' } : isSet ? { bg:'#ede9fe', fg:'#7c3aed' } : { bg:'#fee2e2', fg:'#dc2626' };
+  const sign = isInc ? '+' : (isTr ? '' : '−');
+  const amtColor = isInc ? '#10b981' : (isDraft ? '#d97706' : '#111');
+  const acct = (state.accounts || []).find(a => a.id === (isInc ? t.toAccountId : t.fromAccountId));
+  const acctLbl = acct ? (acct.bank || acct.name) : '';
+  const card = (state.cards || []).find(c => c.id === t.cardId);
+  const cardLbl = card ? (card.issuer || card.name) : '';
+
+  sheet.innerHTML = `
+    <div class="mv2-sheet-handle"></div>
+    <div class="mv2-sheet-titlebar">
+      <div class="mv2-sheet-title">${isDraft ? 'Draft transaction' : 'Transaction'}</div>
+      <button class="mv2-sheet-close" onclick="mv2CloseDetailSheet()"><i data-lucide="x"></i></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;padding:4px 0 16px;border-bottom:1px solid #f3f4f6;margin-bottom:14px;">
+      <div style="width:54px;height:54px;border-radius:14px;background:${tint.bg};color:${tint.fg};display:flex;align-items:center;justify-content:center;"><i data-lucide="${icon}" style="width:24px;height:24px;"></i></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;color:#6b7280;">${mv2RelDate(t.date)} · ${escapeHTML(catName)}</div>
+        <div style="font-size:24px;font-weight:700;color:${amtColor};">${sign}${fmt(t.amount)}</div>
+        ${acctLbl || cardLbl ? `<div style="font-size:11px;color:#6b7280;">${cardLbl ? 'On ' + escapeHTML(cardLbl) : (isInc ? 'To ' : 'From ') + escapeHTML(acctLbl)}</div>` : ''}
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Details</div>
+      <div style="background:#f7f5ef;border-radius:12px;padding:10px;">
+        ${t.payee ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Payee</span><span>${escapeHTML(t.payee)}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Date</span><span>${fmtDate(t.date)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Type</span><span style="text-transform:capitalize;">${t.type}</span></div>
+        ${t.subcategory ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Subcategory</span><span>${escapeHTML(t.subcategory)}</span></div>` : ''}
+        ${t.reference ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Reference</span><span>${escapeHTML(t.reference)}</span></div>` : ''}
+        ${t.note ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Note</span><span style="text-align:right;max-width:60%;">${escapeHTML(t.note)}</span></div>` : ''}
+        ${t.taxFlag ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Tax flag</span><span style="background:#ede9fe;color:#5b21b6;padding:1px 7px;border-radius:6px;font-size:11px;font-weight:700;">${escapeHTML(t.taxFlag)}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#6b7280;">Status</span><span style="background:${isDraft?'#fef3c7':'#d1fae5'};color:${isDraft?'#92400e':'#065f46'};padding:1px 7px;border-radius:6px;font-size:11px;font-weight:700;">${isDraft?'DRAFT':'SETTLED'}</span></div>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Quick actions</div>
+    <div class="mv2-qa-row">
+      ${isDraft ? `<button class="mv2-qa-tile primary t-invest" onclick="mv2QASettle('${t.id}')"><i data-lucide="check"></i>Settle</button>` : `<button class="mv2-qa-tile primary t-acct" onclick="mv2QAEditTxn('${t.id}')"><i data-lucide="edit"></i>Edit</button>`}
+      <button class="mv2-qa-tile" onclick="mv2QADuplicateTxn('${t.id}')"><i data-lucide="copy"></i>Duplicate</button>
+      <button class="mv2-qa-tile" style="color:#ef4444;" onclick="mv2QADeleteTxn('${t.id}')"><i data-lucide="trash-2"></i>Delete</button>
+    </div>
+    ${isDraft ? `<button class="mv2-qa-tile" style="width:100%;margin-top:0;" onclick="mv2QAEditTxn('${t.id}')"><i data-lucide="edit"></i>Edit draft</button>` : ''}
+  `;
+  if (window.lucide) lucide.createIcons();
+}
+
+async function mv2SettleDraftRow(id) {
+  if (typeof settleDraft === 'function') {
+    await settleDraft(id);
+    setTimeout(() => mv2TransactionsPage(document.getElementById('mv2Body')), 100);
+  }
+}
+
+function mv2QAEditTxn(id) {
+  mv2CloseDetailSheet();
+  setTimeout(() => { if (typeof openTxnModal === 'function') openTxnModal(id); }, 240);
+}
+
+async function mv2QASettle(id) {
+  mv2CloseDetailSheet();
+  if (typeof settleDraft === 'function') {
+    await settleDraft(id);
+    setTimeout(() => mv2TransactionsPage(document.getElementById('mv2Body')), 100);
+  }
+}
+
+async function mv2QADeleteTxn(id) {
+  mv2CloseDetailSheet();
+  if (typeof deleteTxn === 'function') {
+    await deleteTxn(id, false);
+    setTimeout(() => mv2TransactionsPage(document.getElementById('mv2Body')), 100);
+  }
+}
+
+async function mv2QADuplicateTxn(id) {
+  mv2CloseDetailSheet();
+  const t = (state.transactions || []).find(x => x.id === id);
+  if (!t) return;
+  const dup = { ...t, id: uid(), date: today(), status: 'Draft', draftCreatedAt: nowISO(), settledAt: null };
+  state.transactions.push(dup);
+  try {
+    await dbPut('transactions', dup);
+    if (typeof audit === 'function') audit('create', 'transaction', dup.id, null, dup).catch(()=>{});
+    toast('Draft created — review and settle when ready', 'success');
+    setTimeout(() => {
+      mv2TransactionsPage(document.getElementById('mv2Body'));
+      setTimeout(() => { if (typeof openTxnModal === 'function') openTxnModal(dup.id); }, 200);
+    }, 100);
+  } catch (e) {
+    toast('Duplicate failed: ' + e.message, 'error');
+  }
+}
+
+/* ====== Subpage system — for native mobile views within the shell ====== */
+function mv2OpenSubpage(subPageId) {
+  mv2State.subPage = subPageId;
+  mv2State.subPageFilter = 'all';
+  mv2Render();
+  const b = document.getElementById('mv2Body');
+  if (b) {
+    b.scrollTop = 0;
+    b.classList.remove('slide-right', 'slide-left');
+    void b.offsetWidth;
+    b.classList.add('slide-right');
+  }
+}
+function mv2CloseSubpage() {
+  mv2State.subPage = null;
+  mv2Render();
+}
+
 /* ====== Navigate to a non-tab page (Settings, People, etc.) ====== */
 function mv2NavigateToPage(pageId) {
+  // Mobile-native subpages handled by mv2OpenSubpage instead of desktop fallback
+  const mobileNative = ['recurring', 'transactions'];
+  if (mobileNative.includes(pageId)) {
+    mv2OpenSubpage(pageId);
+    return;
+  }
   // Remember which tab user was on so back restores it
   mv2State.tabBeforePage = mv2State.tab;
   mv2State.hiddenForPage = true;
